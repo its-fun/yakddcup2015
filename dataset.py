@@ -49,7 +49,7 @@ def load_test():
 
         fio.cache(X, pkl_path)
 
-    return X.as_matrix()[:, 1:].astype(np.float)
+    return X
 
 
 def __enroll_ids_with_log__(enroll_ids, base_date):
@@ -78,7 +78,7 @@ def __load_dataset__(enroll_ids, base_date):
                          ['enrollment_id'])
     y = [int(eid not in active_eids) for eid in enroll_ids]
 
-    return X.as_matrix()[:, 1:].astype(np.float), np.array(y, dtype=np.int)
+    return X, np.array(y, dtype=np.int)
 
 
 def load_train(depth=0):
