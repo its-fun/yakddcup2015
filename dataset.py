@@ -34,6 +34,7 @@ def load_test():
     """
     pkl_path = path.of_cache('test_X.pkl')
     X = fio.fetch_cache(pkl_path)
+
     if X is None:
         enroll_set = fio.load_enrollment_test()
         log = fio.load_logs()
