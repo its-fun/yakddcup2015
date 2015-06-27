@@ -71,7 +71,7 @@ def __load_dataset__(methods, enroll_ids, base_date):
     return X.as_matrix()[:, 1:].astype(np.float), np.array(y, dtype=np.int)
 
 
-def load_train(methods=None, depth=1):
+def load_train(methods=None, depth=0):
     """
     Load dataset for training and validating.
 
@@ -84,8 +84,8 @@ def load_train(methods=None, depth=1):
     They will be used to get features. See module `features' for detail. If
     it is None, it's METHODS in module `features'.
 
-    depth: int, 1 by default
-    Maximum moves of time window.
+    depth: int, 0 by default
+    Maximum moves of time window. 0 means no need to move time window.
 
     Returns
     -------
@@ -175,7 +175,7 @@ if __name__ == '__main__':
             os.remove(f)
 
     elif sys.argv[1] == 'gen':
-        X, y = load_train()
+        X, y = load_train(depth=1)
         print('X.shape: %d x %d' % X.shape)
         print('y.shape: %d' % y.shape)
         X_test = load_test()
