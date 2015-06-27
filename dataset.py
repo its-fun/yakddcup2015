@@ -13,7 +13,6 @@ import sys
 import os
 
 import numpy as np
-import pandas as pd
 
 import features
 import path
@@ -27,6 +26,7 @@ def load_test():
     """
     Load dataset for testing.
 
+
     Returns
     -------
     X: numpy ndarray, shape: (num_of_enrollments, num_of_features)
@@ -36,11 +36,16 @@ def load_test():
     X = fio.fetch_cache(pkl_path)
     if X is None:
         enroll_set = fio.load_enrollment_test()
+        log = fio.load_logs()
+        obj = fio.load_object()
         base_date = datetime(2014, 8, 1, 22, 0, 47)
-        X = enroll_set[['enrollment_id']]
+        X = None
         for f in features.METHODS:
-            X = pd.merge(X, f(enroll_set, base_date), how='left',
-                         on='enrollment_id')
+            X_ = f(enroll_set, log, obj, base_date)
+            if X is None:
+                X = X_
+            else:
+                X = np.c_[X, X_]
 
         fio.cache(X, pkl_path)
 
@@ -53,16 +58,21 @@ def __enroll_ids_with_log__(enroll_ids, base_date):
     return np.array([eid for eid in enroll_ids if eid in log_eids])
 
 
-def __load_dataset__(methods, enroll_ids, base_date):
+def __load_dataset__(enroll_ids, base_date):
     """get all instances in this time window"""
     enroll_set = fio.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
-    X = enroll_set[['enrollment_id']]
-    for f in methods:
-        X = pd.merge(X, f(enroll_set, base_date), how='left',
-                     on='enrollment_id')
-
     log = fio.load_logs()
+    obj = fio.load_object()
+
+    X = None
+    for f in features.METHODS:
+        X_ = f(enroll_set, log, obj, base_date)
+        if X is None:
+            X = X_
+        else:
+            X = np.c_[X, X_]
+
     active_eids = set(log[(log['time'] > base_date) &
                           (log['time'] <= base_date + timedelta(days=10))]
                          ['enrollment_id'])
@@ -71,21 +81,19 @@ def __load_dataset__(methods, enroll_ids, base_date):
     return X.as_matrix()[:, 1:].astype(np.float), np.array(y, dtype=np.int)
 
 
-def load_train(methods=None, depth=0):
+def load_train(depth=0):
     """
     Load dataset for training and validating.
 
     *NOTE*  If you need a validating set, you SHOULD split from training set
     by yourself.
 
+
     Args
     ----
-    methods: list of callable, None by default
-    They will be used to get features. See module `features' for detail. If
-    it is None, it's METHODS in module `features'.
-
     depth: int, 0 by default
     Maximum moves of time window. 0 means no need to move time window.
+
 
     Returns
     -------
@@ -96,9 +104,6 @@ def load_train(methods=None, depth=0):
     Vector of labels. It is the labels of all time if cache_only is True.
     """
     logger = logging.getLogger('load_train')
-
-    if methods is None:
-        methods = features.METHODS
 
     enroll_set = fio.load_enrollment_train()
     base_date = datetime(2014, 8, 1, 22, 0, 47)
@@ -117,7 +122,7 @@ def load_train(methods=None, depth=0):
     if X is None or y is None:
         logger.debug('cache missed, calculating ...')
 
-        X, _ = __load_dataset__(methods, enroll_ids, base_date)
+        X, _ = __load_dataset__(enroll_ids, base_date)
         y_with_id = fio.load_train_y()
 
         if not np.all(y_with_id[:, 0] == enroll_ids):
@@ -148,7 +153,7 @@ def load_train(methods=None, depth=0):
         if X_temp is None or y_temp is None:
             logger.debug('cache missed, calculating ...')
 
-            X_temp, y_temp = __load_dataset__(methods, enroll_ids, base_date)
+            X_temp, y_temp = __load_dataset__(enroll_ids, base_date)
 
             fio.cache(X_temp, pkl_X_path)
             fio.cache(y_temp, pkl_y_path)

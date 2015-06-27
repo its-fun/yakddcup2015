@@ -8,20 +8,29 @@ Extracting feature(s).
 Every submodule has a function named `extract', they should satisfy the
 signature described as below:
 
+
 Args
 ----
 enrollment: pandas DataFrame
 Features of these enrollments will be generated. The columns should be:
-enrollment_id, username, course_id
+enrollment_id, username, course_id.
+
+log: pandas DataFrame
+Full dataset.
+
+obj: pandas DataFrame
+Full dataset.
 
 base_date: datetime object
 Generated features are to predict user dropout bahaviour in the next 10 days
 after `base_date'.
 
+
 Returns
 -------
-X: pandas DataFrame
-Extracted feature(s). The first column should be enrollment_id.
+X: numpy ndarray
+Extracted feature(s) of corresponding enrollments. Shape should be:
+(len(enrollment), n_features)
 """
 
 
