@@ -42,7 +42,7 @@ def load_test():
         base_date = datetime(2014, 8, 1, 22, 0, 47)
         X = None
         for f in features.METHODS:
-            X_ = f(enroll_set, log, obj, base_date)
+            X_ = f.extract(enroll_set, log, obj, base_date)
             if X is None:
                 X = X_
             else:
@@ -68,7 +68,7 @@ def __load_dataset__(enroll_ids, base_date):
 
     X = None
     for f in features.METHODS:
-        X_ = f(enroll_set, log, obj, base_date)
+        X_ = f.extract(enroll_set, log, obj, base_date)
         if X is None:
             X = X_
         else:
