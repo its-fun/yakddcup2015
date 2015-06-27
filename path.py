@@ -13,6 +13,10 @@ def of(filename):
     return os.path.abspath(os.path.join('data', filename))
 
 
+def of_cache(filename):
+    return os.path.abspath(os.path.join('data', 'cache', filename))
+
+
 OBJECT = of('object.csv')
 
 TEST_ENROLL = of('enrollment_test.csv')
