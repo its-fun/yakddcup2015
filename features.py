@@ -19,10 +19,6 @@ base_date: datetime object
 Generated features are to predict user dropout bahaviour in the next 10 days
 after `base_date'.
 
-full_dataset: dict
-{'enroll': <pandas DataFrame>, 'log': <pandas DataFrame>,
- 'obj': <pandas DataFrame>}
-
 
 Returns
 -------
