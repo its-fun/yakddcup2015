@@ -51,15 +51,6 @@ is week number (all start from 0), and y is the weekly number of events
 + 2 counts of source types
 
 
-### Dropout：连续十天无操作
-
-+ 课程最后十天无操作的人数，与选课人数的比例
-
-+ 用户在该课程中Dropout的次数，与平均每个课程Dropout次数的比例；总Dropout持续时长与课程持续时间的比例
-
-+ 用户在所有课程上Dropout总持续时长与课程持续时间的比例的：平均值、方差、最大值、最小值；有Dropout行为的课程占用户所选课程总数的比例
-
-
 ### Session
 
 + number of 3-hour defined sessions in the enrollment
@@ -109,3 +100,12 @@ defined sessions in the enrollment
 + month (1-12) of the first, last event in the enrollment
 
 + 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，前一周、前两周、第一周、总体
+
+
+### Dropout：连续十天无操作
+
++ 课程最后十天无操作的人数，与选课人数的比例
+
++ 用户在该课程中Dropout的次数，与平均每个课程Dropout次数的比例；总Dropout持续时长与课程持续时间的比例
+
++ 用户在所有课程上Dropout总持续时长与课程持续时间的比例的：平均值、方差、最大值、最小值；有Dropout行为的课程占用户所选课程总数的比例
