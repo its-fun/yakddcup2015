@@ -89,3 +89,11 @@ def load_object():
 
 def load_train_y():
     return pd.read_csv(path.TRAIN_Y, header=None, names=['enrollment_id', 'y'])
+
+
+def load_full_dataset():
+    return {
+        'enroll': load_enrollments(),
+        'log': load_logs(),
+        'obj': load_object()
+    }

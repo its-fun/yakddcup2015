@@ -22,11 +22,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
 
 
-FULL_DATASET = {
-    'enroll': fio.load_enrollments(),
-    'log': fio.load_logs(),
-    'obj': fio.load_object()
-}
+FULL_DATASET = fio.load_full_dataset()
 
 
 def load_test():
