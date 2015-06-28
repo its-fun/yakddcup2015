@@ -6,11 +6,7 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 ## TODO
 
-0. 根据特征选择的结果对特征进行重新加工
-
-1. 观察决策树，进行特征选择、加工
-
-2. 谨慎进行特征normalize，最好手工来做
+1. 特征选择与normalize
 
 2. 手工加入规则，比如关于课程最近更新时间、用户最近操作时间
 
@@ -25,9 +21,9 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 ### Event
 
-+ 用户在该课程的操作数量，前一周、前两周、第一周，占该用户在所有课程的比例，占该课程所有用户的比例
++ 用户在该课程的操作数量，enrollment最后一周、倒数第二周、第一周，占该用户在所有课程的比例，占该课程所有用户的比例
 
-+ 用户有行为的课程数量，前一周、前两周、第一周、总体
++ 用户有行为的课程数量，用户行为的最后一周、倒数第二周、第一周、总体
 
 + 课程的选课人数
 
@@ -99,7 +95,7 @@ defined sessions in the enrollment
 
 + month (1-12) of the first, last event in the enrollment
 
-+ 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，前一周、前两周、第一周、总体
++ 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，enrollment最后一周、倒数第二周、第一周、总体
 
 
 ### Dropout：连续十天无操作
