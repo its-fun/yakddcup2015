@@ -13,6 +13,7 @@ import sys
 import os
 
 import numpy as np
+import pandas as pd
 
 import features
 import path
@@ -44,6 +45,8 @@ def load_test():
         X = None
         for f in features.METHODS:
             X_ = f.extract(enroll_set, base_date, FULL_DATASET)
+            if np.any(np.isnan(X_)):
+                raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
             if X is None:
                 X = X_
             else:
@@ -68,6 +71,8 @@ def __load_dataset__(enroll_ids, base_date):
     X = None
     for f in features.METHODS:
         X_ = f.extract(enroll_set, base_date, FULL_DATASET)
+        if np.any(np.isnan(X_)):
+            raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
         if X is None:
             X = X_
         else:
@@ -125,11 +130,11 @@ def load_train(depth=0):
         X, _ = __load_dataset__(enroll_ids, base_date)
         y_with_id = fio.load_train_y()
 
-        if not np.all(y_with_id[:, 0] == enroll_ids):
-            logger.fatal('something wrong with enroll_ids')
-            raise RuntimeError('something wrong with enroll_ids')
-
-        y = y_with_id[:, 1]
+        y = np.array(pd.merge(enroll_set, y_with_id, how='left',
+                              on='enrollment_id')['y'])
+        if np.any(np.isnan(y)):
+            logger.fatal('something wrong with y')
+            raise RuntimeError('something wrong with y')
 
         fio.cache(X, pkl_X_path)
         fio.cache(y, pkl_y_path)
