@@ -15,15 +15,13 @@ enrollment: pandas DataFrame
 Features of these enrollments will be generated. The columns should be:
 enrollment_id, username, course_id.
 
-log: pandas DataFrame
-Full dataset.
-
-obj: pandas DataFrame
-Full dataset.
-
 base_date: datetime object
 Generated features are to predict user dropout bahaviour in the next 10 days
 after `base_date'.
+
+full_dataset: dict
+{'enroll': <pandas DataFrame>, 'log': <pandas DataFrame>,
+ 'obj': <pandas DataFrame>}
 
 
 Returns

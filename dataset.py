@@ -22,6 +22,13 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
 
 
+FULL_DATASET = {
+    'enroll': fio.load_enrollments(),
+    'log': fio.load_logs(),
+    'obj': fio.load_object()
+}
+
+
 def load_test():
     """
     Load dataset for testing.
@@ -37,12 +44,10 @@ def load_test():
 
     if X is None:
         enroll_set = fio.load_enrollment_test()
-        log = fio.load_logs()
-        obj = fio.load_object()
         base_date = datetime(2014, 8, 1, 22, 0, 47)
         X = None
         for f in features.METHODS:
-            X_ = f.extract(enroll_set, log, obj, base_date)
+            X_ = f.extract(enroll_set, base_date, FULL_DATASET)
             if X is None:
                 X = X_
             else:
@@ -54,7 +59,7 @@ def load_test():
 
 
 def __enroll_ids_with_log__(enroll_ids, base_date):
-    log = fio.load_logs()
+    log = FULL_DATASET['log']
     log_eids = set(log[log['time'] <= base_date]['enrollment_id'].unique())
     return np.array([eid for eid in enroll_ids if eid in log_eids])
 
@@ -63,12 +68,10 @@ def __load_dataset__(enroll_ids, base_date):
     """get all instances in this time window"""
     enroll_set = fio.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
-    log = fio.load_logs()
-    obj = fio.load_object()
-
+    log = FULL_DATASET['log']
     X = None
     for f in features.METHODS:
-        X_ = f.extract(enroll_set, log, obj, base_date)
+        X_ = f.extract(enroll_set, base_date, FULL_DATASET)
         if X is None:
             X = X_
         else:

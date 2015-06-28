@@ -2,5 +2,5 @@
 # -*- utf-8 -*-
 
 
-def extract(enrollment, log, obj, base_date):
+def extract(enrollment, base_date, full_dataset):
     pass
