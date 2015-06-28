@@ -38,6 +38,22 @@ def __cache__(func):
     return cached_func
 
 
+def cache_to(file_path):
+    def __cache__(func):
+        def cached_func(*args, **kwargs):
+            pkl_path = path.of_cache(file_path + '.pkl')
+            data = fetch_cache(pkl_path)
+
+            if data is None:
+                data = func(*args, **kwargs)
+
+                cache(data, pkl_path)
+
+            return data
+        return cached_func
+    return __cache__
+
+
 @__cache__
 def __load_log__(file_path):
     log_set = pd.read_csv(file_path, parse_dates=['time'])
@@ -53,6 +69,7 @@ def load_log_test():
     return __load_log__(path.TEST_LOG)
 
 
+@cache_to('log_all')
 def load_logs():
     log_all = load_log_train().append(load_log_test(), ignore_index=True)
     log_all.sort('enrollment_id', inplace=True)
@@ -74,6 +91,7 @@ def load_enrollment_test():
     return __load_enrollment__(path.TEST_ENROLL)
 
 
+@cache_to('enroll_all')
 def load_enrollments():
     enroll_all = load_enrollment_train().append(load_enrollment_test(),
                                                 ignore_index=True)
@@ -91,6 +109,7 @@ def load_train_y():
     return pd.read_csv(path.TRAIN_Y, header=None, names=['enrollment_id', 'y'])
 
 
+@cache_to('full_dataset')
 def load_full_dataset():
     return {
         'enroll': load_enrollments(),
