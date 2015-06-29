@@ -30,6 +30,7 @@ import dataset
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
+logger = logging.getLogger(__file__)
 
 
 def extract(enrollment, base_date):
