@@ -90,17 +90,23 @@ def extract(enrollment, base_date):
     EUC_first_week = count_source_event_features(log_first_week, enroll_all)
     EUC_all = count_source_event_features(log_all, enroll_all)
 
+    logger.debug('0~107, 114~125')
+
     # 108~111: 用户有行为的课程数量，用户行为的最后一周、倒数第二周、第一周、总体
     C_last_week = count_courses_by_user(log_last_week, enroll_all)
     C_2nd_last_week = count_courses_by_user(log_2nd_last_week, enroll_all)
     C_first_week = count_courses_by_user(log_first_week, enroll_all)
     C_all = count_courses_by_user(log_all, enroll_all)
 
+    logger.debug('108~111')
+
     # 112: 课程的选课人数
     U_count = pd.merge(
         log_all, enroll_all, how='left', on='enrollment_id')\
         .groupby('course_id').agg({'username': lambda us: len(np.unique(us))})\
         .reset_index().rename(columns={'username': 'user_count'})
+
+    logger.debug('112')
 
     return None
 
