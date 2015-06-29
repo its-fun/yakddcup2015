@@ -107,12 +107,3 @@ def load_object():
 
 def load_train_y():
     return pd.read_csv(Path.TRAIN_Y, header=None, names=['enrollment_id', 'y'])
-
-
-@cache_to('full_dataset')
-def load_full_dataset():
-    return {
-        'enroll': load_enrollments(),
-        'log': load_logs(),
-        'obj': load_object()
-    }

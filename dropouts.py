@@ -17,12 +17,12 @@ Total: 11
 
 import logging
 import sys
+import multiprocessing as par
 
 import numpy as np
 import pandas as pd
 
 import IO
-import dataset
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
@@ -31,9 +31,14 @@ logger = logging.getLogger(__file__)
 
 
 def extract(enrollment, base_date):
-    enroll_all = dataset.FULL_DATASET['enroll']
-    log_all = dataset.FULL_DATASET['log']
+    logger.debug('prepare datasets ...')
+
+    enroll_all = IO.load_enrollments()
+    log_all = IO.load_logs()
+    obj_all = IO.load_object()
+
     log_all = log_all[log_all['time'] <= base_date]
-    obj_all = dataset.FULL_DATASET['obj']
+
+    logger.debug('datasets prepared')
 
     return None
