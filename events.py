@@ -66,7 +66,8 @@ def extract(enrollment, base_date):
 
     log_all = pd.merge(log_all, enroll_duration(), how='left',
                        on='enrollment_id')
-
+    log_all['day_diff'] = (log_all['time'] - log_all['st']).dt.days
+    log_all['week_diff'] = log_all['day_diff'] // 7
     log_all['count'] = 1
 
     logger.debug('datasets prepared')
