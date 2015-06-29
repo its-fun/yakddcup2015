@@ -101,8 +101,16 @@ def load_enrollments():
     return enroll_all
 
 
+@cache_to('object')
 def load_object():
-    return pd.read_csv(Path.OBJECT, parse_dates=['start'], na_values=['null'])
+    obj = pd.read_csv(Path.OBJECT, parse_dates=['start'], na_values=['null'])
+    obj['children'] = obj['children'].fillna('')
+
+    obj.drop_duplicates(inplace=True)
+    obj.drop([3108, 21274, 26771], inplace=True)
+    obj.ix[643, 'children'] = obj.ix[643, 'children'].split()[0]
+
+    return obj.reset_index(drop=True)
 
 
 def load_train_y():
