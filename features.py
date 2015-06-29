@@ -28,4 +28,10 @@ Extracted feature(s) of corresponding enrollments. Shape should be:
 """
 
 
-METHODS = []
+import events
+import sessions
+import time_related
+import dropouts
+
+
+METHODS = [events, sessions, time_related, dropouts]
