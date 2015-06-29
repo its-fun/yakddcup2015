@@ -23,7 +23,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
 
 
-FULL_DATASET = IO.load_full_dataset()
+log = IO.load_logs()
 
 
 def load_test():
@@ -61,7 +61,6 @@ def load_test():
 
 
 def __enroll_ids_with_log__(enroll_ids, base_date):
-    log = FULL_DATASET['log']
     log_eids = set(log[log['time'] <= base_date]['enrollment_id'].unique())
     return np.array([eid for eid in enroll_ids if eid in log_eids])
 
@@ -70,7 +69,6 @@ def __load_dataset__(enroll_ids, base_date):
     """get all instances in this time window"""
     enroll_set = IO.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
-    log = FULL_DATASET['log']
     X = None
     for f in features.METHODS:
         X_ = f.extract(enroll_set, base_date)
