@@ -8,7 +8,7 @@ import pickle as pkl
 
 import pandas as pd
 
-import path
+import Path
 
 
 def cache(obj, file_path):
@@ -41,7 +41,7 @@ def __cache__(func):
 def cache_to(file_path):
     def __cache__(func):
         def cached_func(*args, **kwargs):
-            pkl_path = path.of_cache(file_path + '.pkl')
+            pkl_path = Path.of_cache(file_path + '.pkl')
             data = fetch_cache(pkl_path)
 
             if data is None:
@@ -62,11 +62,11 @@ def __load_log__(file_path):
 
 
 def load_log_train():
-    return __load_log__(path.TRAIN_LOG)
+    return __load_log__(Path.TRAIN_LOG)
 
 
 def load_log_test():
-    return __load_log__(path.TEST_LOG)
+    return __load_log__(Path.TEST_LOG)
 
 
 @cache_to('log_all')
@@ -84,11 +84,11 @@ def __load_enrollment__(file_path):
 
 
 def load_enrollment_train():
-    return __load_enrollment__(path.TRAIN_ENROLL)
+    return __load_enrollment__(Path.TRAIN_ENROLL)
 
 
 def load_enrollment_test():
-    return __load_enrollment__(path.TEST_ENROLL)
+    return __load_enrollment__(Path.TEST_ENROLL)
 
 
 @cache_to('enroll_all')
@@ -102,11 +102,11 @@ def load_enrollments():
 
 
 def load_object():
-    return pd.read_csv(path.OBJECT, parse_dates=['start'], na_values=['null'])
+    return pd.read_csv(Path.OBJECT, parse_dates=['start'], na_values=['null'])
 
 
 def load_train_y():
-    return pd.read_csv(path.TRAIN_Y, header=None, names=['enrollment_id', 'y'])
+    return pd.read_csv(Path.TRAIN_Y, header=None, names=['enrollment_id', 'y'])
 
 
 @cache_to('full_dataset')

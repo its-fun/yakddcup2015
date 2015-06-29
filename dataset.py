@@ -16,14 +16,14 @@ import numpy as np
 import pandas as pd
 
 import features
-import path
-import fio
+import Path
+import IO
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
 
 
-FULL_DATASET = fio.load_full_dataset()
+FULL_DATASET = IO.load_full_dataset()
 
 
 def load_test():
@@ -36,11 +36,11 @@ def load_test():
     X: numpy ndarray, shape: (num_of_enrollments, num_of_features)
     Rows of features.
     """
-    pkl_path = path.of_cache('test_X.pkl')
-    X = fio.fetch_cache(pkl_path)
+    pkl_path = Path.of_cache('test_X.pkl')
+    X = IO.fetch_cache(pkl_path)
 
     if X is None:
-        enroll_set = fio.load_enrollment_test()
+        enroll_set = IO.load_enrollment_test()
         base_date = datetime(2014, 8, 1, 22, 0, 47)
         X = None
         for f in features.METHODS:
@@ -55,7 +55,7 @@ def load_test():
             else:
                 X = np.c_[X, X_]
 
-        fio.cache(X, pkl_path)
+        IO.cache(X, pkl_path)
 
     return X
 
@@ -68,7 +68,7 @@ def __enroll_ids_with_log__(enroll_ids, base_date):
 
 def __load_dataset__(enroll_ids, base_date):
     """get all instances in this time window"""
-    enroll_set = fio.load_enrollments().set_index('enrollment_id')\
+    enroll_set = IO.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
     log = FULL_DATASET['log']
     X = None
@@ -116,7 +116,7 @@ def load_train(depth=0):
     """
     logger = logging.getLogger('load_train')
 
-    enroll_set = fio.load_enrollment_train()
+    enroll_set = IO.load_enrollment_train()
     base_date = datetime(2014, 8, 1, 22, 0, 47)
 
     logger.debug('loading features before %s', base_date)
@@ -124,17 +124,17 @@ def load_train(depth=0):
     enroll_ids = __enroll_ids_with_log__(enroll_set['enrollment_id'],
                                          base_date)
 
-    pkl_X_path = path.of_cache('train_X.%s.pkl' % base_date)
-    pkl_y_path = path.of_cache('train_y.%s.pkl' % base_date)
+    pkl_X_path = Path.of_cache('train_X.%s.pkl' % base_date)
+    pkl_y_path = Path.of_cache('train_y.%s.pkl' % base_date)
 
-    X = fio.fetch_cache(pkl_X_path)
-    y = fio.fetch_cache(pkl_y_path)
+    X = IO.fetch_cache(pkl_X_path)
+    y = IO.fetch_cache(pkl_y_path)
 
     if X is None or y is None:
         logger.debug('cache missed, calculating ...')
 
         X, _ = __load_dataset__(enroll_ids, base_date)
-        y_with_id = fio.load_train_y()
+        y_with_id = IO.load_train_y()
 
         y = np.array(pd.merge(enroll_set, y_with_id, how='left',
                               on='enrollment_id')['y'])
@@ -142,8 +142,8 @@ def load_train(depth=0):
             logger.fatal('something wrong with y')
             raise RuntimeError('something wrong with y')
 
-        fio.cache(X, pkl_X_path)
-        fio.cache(y, pkl_y_path)
+        IO.cache(X, pkl_X_path)
+        IO.cache(y, pkl_y_path)
 
     base_date = datetime(2014, 7, 22, 22, 0, 47)
     Dw = timedelta(days=7)
@@ -156,18 +156,18 @@ def load_train(depth=0):
         logger.debug('loading features before %s', base_date)
 
         # get instances and labels
-        pkl_X_path = path.of_cache('train_X.%s.pkl' % base_date)
-        pkl_y_path = path.of_cache('train_y.%s.pkl' % base_date)
+        pkl_X_path = Path.of_cache('train_X.%s.pkl' % base_date)
+        pkl_y_path = Path.of_cache('train_y.%s.pkl' % base_date)
 
-        X_temp = fio.fetch_cache(pkl_X_path)
-        y_temp = fio.fetch_cache(pkl_y_path)
+        X_temp = IO.fetch_cache(pkl_X_path)
+        y_temp = IO.fetch_cache(pkl_y_path)
         if X_temp is None or y_temp is None:
             logger.debug('cache missed, calculating ...')
 
             X_temp, y_temp = __load_dataset__(enroll_ids, base_date)
 
-            fio.cache(X_temp, pkl_X_path)
-            fio.cache(y_temp, pkl_y_path)
+            IO.cache(X_temp, pkl_X_path)
+            IO.cache(y_temp, pkl_y_path)
 
         # update instances and labels
         X = np.r_[X, X_temp]
@@ -183,9 +183,9 @@ def load_train(depth=0):
 if __name__ == '__main__':
     import glob
     if sys.argv[1] == 'clean':
-        cached_files = glob.glob(path.of_cache('train_X*.pkl'))
-        cached_files += glob.glob(path.of_cache('train_y*.pkl'))
-        cached_files += glob.glob(path.of_cache('test_X.pkl'))
+        cached_files = glob.glob(Path.of_cache('train_X*.pkl'))
+        cached_files += glob.glob(Path.of_cache('train_y*.pkl'))
+        cached_files += glob.glob(Path.of_cache('test_X.pkl'))
         for f in cached_files:
             print('Removing %s ...' % f)
             os.remove(f)
