@@ -58,3 +58,5 @@ target/
 
 # data
 data/
+.ipynb_checkpoints/
+*.ipynb
