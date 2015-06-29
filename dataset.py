@@ -44,7 +44,7 @@ def load_test():
         base_date = datetime(2014, 8, 1, 22, 0, 47)
         X = None
         for f in features.METHODS:
-            X_ = f.extract(enroll_set, base_date, FULL_DATASET)
+            X_ = f.extract(enroll_set, base_date)
             if X_ is None:
                 print('%s returns None' % repr(f.__name__))
                 continue
@@ -73,7 +73,7 @@ def __load_dataset__(enroll_ids, base_date):
     log = FULL_DATASET['log']
     X = None
     for f in features.METHODS:
-        X_ = f.extract(enroll_set, base_date, FULL_DATASET)
+        X_ = f.extract(enroll_set, base_date)
         if X_ is None:
             print('%s returns None' % repr(f.__name__))
             continue
