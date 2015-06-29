@@ -43,6 +43,8 @@ import numpy as np
 import pandas as pd
 
 import IO
+import Util
+import Path
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
@@ -56,6 +58,13 @@ SE_PAIRS = ['browser-access', 'browser-page_close', 'browser-problem',
 
 
 def extract(enrollment, base_date):
+    pkl_path = Path.of_cache('events.%s.pkl' % base_date)
+    X = IO.fetch_cache(pkl_path)
+    if X is not None:
+        logger.debug('cache hit')
+        return X
+
+    logger.debug('cache missed')
     logger.debug('prepare datasets ...')
 
     enroll_all = IO.load_enrollments()
@@ -109,7 +118,154 @@ def extract(enrollment, base_date):
 
     logger.debug('112')
 
-    return None
+    def f(group):
+        from scipy.stats import linregress
+        x = group['week_diff']
+        c = group['count']
+        if len(c) < 3:
+            p = [0, 0]
+        else:
+            p = np.polyfit(x, c, 2)
+        import warnings
+        warnings.simplefilter('ignore', np.RankWarning)
+        return pd.Series(
+            [linregress(x, c)[0], np.average(c), np.std(c), np.max(c),
+             np.min(c), p[1], p[0]],
+            index=['slope', 'mean', 'std', 'max', 'min', 'b', 'c'])
+
+    # 113: trending slope of the weekly number of events within the enrollment
+    # 126~129: average, standard deviation, maximal, minimal weekly numbers of
+    # events in the enrollment period
+    # 130~131: coefficients b and c in the polynomial model y = a + bx + cx**2,
+    # where x is week number (all start from 0), and y is the weekly number of
+    # events
+    W_stats = log_all.groupby(['enrollment_id', 'week_diff'])\
+        .agg({'count': np.sum}).reset_index().groupby('enrollment_id').apply(f)
+    W_stats.fillna(0, inplace=True)
+    W_stats.ix[np.isinf(W_stats['c']), 'c'] = np.max(
+        W_stats[~np.isinf(W_stats['c'])])
+
+    logger.debug('113, 126~129, 130~131')
+
+    log_all['week_day'] = log_all['time'].dt.dayofweek
+    log_all['hour'] = log_all['time'].dt.hour
+
+    week_day_counts = log_all.groupby(['enrollment_id', 'week_day'])\
+        .agg({'count': np.sum}).reset_index()
+    week_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
+                 'Saturday', 'Sunday']
+    for i, wd in enumerate(week_days):
+        week_day_counts[wd] = 0
+        week_day_counts.loc[week_day_counts['week_day'] == i, wd] += \
+            week_day_counts[week_day_counts['week_day'] == i]['count']
+    del week_day_counts['week_day']
+    del week_day_counts['count']
+
+    # 132~138: 7 counts of events in Monday to Sunday
+    WD = week_day_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+
+    logger.debug('132~138')
+
+    hour_counts = log_all.groupby(['enrollment_id', 'hour'])\
+        .agg({'count': np.sum}).reset_index()
+    for i in range(24):
+        c = str(i)
+        hour_counts[c] = 0
+        hour_counts.loc[hour_counts['hour'] == i, c] += \
+            hour_counts[hour_counts['hour'] == i]['count']
+    del hour_counts['hour']
+    del hour_counts['count']
+
+    # 139~162: 24 counts of events in hour 0-23
+    H = hour_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+
+    logger.debug('139~162')
+
+    event_counts = log_all.groupby(['enrollment_id', 'event'])\
+        .agg({'count': np.sum}).reset_index()
+    event_types = ['access', 'page_close', 'problem', 'video', 'discussion',
+                   'navigate', 'wiki']
+    for e in event_types:
+        event_counts[e] = 0
+        event_counts.loc[event_counts['event'] == e, e] += \
+            event_counts[event_counts['event'] == e]['count']
+    del event_counts['event']
+    del event_counts['count']
+
+    # 163~169: 7 counts of event types
+    E = event_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+
+    logger.debug('163~169')
+
+    source_counts = log_all.groupby(['enrollment_id', 'source'])\
+        .agg({'count': np.sum}).reset_index()
+    for s in ['server', 'browser']:
+        source_counts[s] = 0
+        source_counts.loc[source_counts['source'] == s, s] += \
+            source_counts[source_counts['source'] == s]['count']
+    del source_counts['source']
+    del source_counts['count']
+
+    # 170~171: 2 counts of source types
+    S = source_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+
+    logger.debug('170~171')
+
+    logger.debug('composing to features')
+
+    check_dataframe = Util.dataframe_checker(logger)
+
+    check_dataframe(EUC_last_week, 'EUC_last_week')
+    X = pd.merge(enrollment[['enrollment_id']], EUC_last_week, how='left',
+                 on='enrollment_id')
+
+    check_dataframe(EUC_2nd_last_week, 'EUC_2nd_last_week')
+    X = pd.merge(X, EUC_2nd_last_week, how='left', on='enrollment_id')
+
+    check_dataframe(EUC_first_week, 'EUC_first_week')
+    X = pd.merge(X, EUC_first_week, how='left', on='enrollment_id')
+
+    check_dataframe(EUC_all, 'EUC_all')
+    X = pd.merge(X, EUC_all, how='left', on='enrollment_id')
+
+    check_dataframe(C_last_week, 'C_last_week')
+    X = pd.merge(X, C_last_week, how='left', on='enrollment_id')
+
+    check_dataframe(C_2nd_last_week, 'C_2nd_last_week')
+    X = pd.merge(X, C_2nd_last_week, how='left', on='enrollment_id')
+
+    check_dataframe(C_first_week, 'C_first_week')
+    X = pd.merge(X, C_first_week, how='left', on='enrollment_id')
+
+    check_dataframe(C_all, 'C_all')
+    X = pd.merge(X, C_all, how='left', on='enrollment_id')
+
+    check_dataframe(U_count, 'U_count')
+    X = pd.merge(X, U_count, how='left', on='enrollment_id')
+
+    check_dataframe(W_stats, 'W_stats')
+    X = pd.merge(X, W_stats, how='left', on='enrollment_id')
+
+    check_dataframe(WD, 'WD')
+    X = pd.merge(X, WD, how='left', on='enrollment_id')
+
+    check_dataframe(H, 'H')
+    X = pd.merge(X, H, how='left', on='enrollment_id')
+
+    check_dataframe(E, 'E')
+    X = pd.merge(X, E, how='left', on='enrollment_id')
+
+    check_dataframe(S, 'S')
+    X = pd.merge(X, S, how='left', on='enrollment_id')
+
+    del X['enrollment_id']
+
+    check_dataframe(X, 'X')
+    X = X.as_matrix()
+
+    IO.cache(X, pkl_path)
+
+    return X
 
 
 def count_courses_by_user(log, enroll_all):
