@@ -45,6 +45,9 @@ def load_test():
         X = None
         for f in features.METHODS:
             X_ = f.extract(enroll_set, base_date, FULL_DATASET)
+            if X_ is None:
+                print('%s returns None' % repr(f.__name__))
+                continue
             if np.any(np.isnan(X_)):
                 raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
             if X is None:
@@ -71,6 +74,9 @@ def __load_dataset__(enroll_ids, base_date):
     X = None
     for f in features.METHODS:
         X_ = f.extract(enroll_set, base_date, FULL_DATASET)
+        if X_ is None:
+            print('%s returns None' % repr(f.__name__))
+            continue
         if np.any(np.isnan(X_)):
             raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
         if X is None:
