@@ -36,6 +36,7 @@ events
 
 import logging
 import sys
+import multiprocessing as par
 
 import numpy as np
 import pandas as pd
@@ -50,9 +51,15 @@ logger = logging.getLogger(__file__)
 
 
 def extract(enrollment, base_date):
+    logger.debug('prepare datasets ...')
+
     enroll_all = dataset.FULL_DATASET['enroll']
     log_all = dataset.FULL_DATASET['log']
     log_all = log_all[log_all['time'] <= base_date]
     obj_all = dataset.FULL_DATASET['obj']
+
+    log_all['source_event'] = log_all['source'] + '-' + log_all['event']
+
+    logger.debug('datasets prepared')
 
     return None
