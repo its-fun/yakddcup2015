@@ -17,9 +17,9 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 5. AdaBoost, RF, Bagging, Blending
 
 
-## Features (251)
+## Features (260)
 
-### Event (163)
+### Event (172)
 
 + 用户在该课程的操作数量（按event_source序对统计），enrollment最后一周、倒数第二周、第一周、总体，占该用户在所有课程的比例，占该课程所有用户的比例 (108)
 
@@ -30,7 +30,8 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 + trending slope of the weekly number of events within the enrollment (1)
 
 + numbers of events in the last week, the first week, and the week before the
-last week of the enrollment (3)
+last week, and all weeks of the enrollment; ratio on all courses by user; ratio
+on all users by course (12)
 
 + average, standard deviation, maximal, minimal weekly numbers of events
 in the enrollment period (4)
