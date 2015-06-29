@@ -156,8 +156,8 @@ def load_train(depth=0):
         logger.debug('loading features before %s', base_date)
 
         # get instances and labels
-        pkl_X_path = path.of_cache('train_X.%s' % base_date)
-        pkl_y_path = path.of_cache('train_y.%s' % base_date)
+        pkl_X_path = path.of_cache('train_X.%s.pkl' % base_date)
+        pkl_y_path = path.of_cache('train_y.%s.pkl' % base_date)
 
         X_temp = fio.fetch_cache(pkl_X_path)
         y_temp = fio.fetch_cache(pkl_y_path)
