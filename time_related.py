@@ -95,7 +95,8 @@ def extract(enrollment, base_date):
     del ET['username']
     del ET['course_id']
 
-    # 2~6: 用户初次、上次操作此课程据今几天，持续几天，与课程持续时间的比例，初次访问课程材料距离开课时间几天
+    # 2~6: 用户初次、上次操作此课程据今几天，持续几天，与课程持续时间的比例，
+    # 初次访问课程材料距离开课时间几天
     # 15~16: month (1-12) of the first, last event in the enrollment
     XE = ET.copy()
     XE['st_e'] = (base_date - XE['st_e']).dt.days
@@ -103,7 +104,8 @@ def extract(enrollment, base_date):
 
     logger.debug('2~6, 15~16')
 
-    # 7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，以及与课程持续时间的比例
+    # 7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，
+    # 以及与课程持续时间的比例
     XU = UT.groupby('course_id')\
         .agg({'duration': [np.average, np.std, np.max, np.min],
               'duration_ratio': [np.average, np.std, np.max, np.min]})\
@@ -129,8 +131,8 @@ def extract(enrollment, base_date):
     op_first_week = op_time[
         op_time['time'] < op_time['st'] + timedelta(days=7)].copy()
 
-    # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，
-    # enrollment最后一周、倒数第二周、第一周、总体
+    # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：
+    # 平均值、标准差、最大值、最小值，enrollment最后一周、倒数第二周、第一周、总体
     XO_last_week = op_last_week.groupby('enrollment_id')\
         .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
     XO_2nd_last_week = op_2nd_last_week.groupby('enrollment_id')\
