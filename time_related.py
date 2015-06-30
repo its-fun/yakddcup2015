@@ -55,12 +55,13 @@ def extract(enrollment, base_date):
 
     logger.debug('datasets prepared')
 
-    course_time = obj_all.groupby('course_id').agg({'start': [np.min, np.max]})
+    course_time = obj_all.groupby('course_id')\
+        .agg({'start': [np.nanmin, np.nanmax]})
     course_time.columns = ['st_c', 'et_c']
     course_time.reset_index(inplace=True)
     # first and last event time of course
     course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id')\
-        .groupby('course_id').agg({'time': [np.min, np.max]})
+        .groupby('course_id').agg({'time': [np.nanmin, np.nanmax]})
     course_t.columns = ['st', 'et']
     course_t.reset_index(inplace=True)
     CT = pd.merge(course_t, course_time, how='left', on='course_id')
@@ -76,7 +77,7 @@ def extract(enrollment, base_date):
 
     logger.debug('0~1')
 
-    ET = log_all.groupby('enrollment_id').agg({'time': [np.min, np.max]})
+    ET = log_all.groupby('enrollment_id').agg({'time': [np.nanmin, np.nanmax]})
     ET.columns = ['st_e', 'et_e']
     ET.reset_index(inplace=True)
     ET['duration'] = (ET['et_e'] - ET['st_e']).dt.days
@@ -105,16 +106,18 @@ def extract(enrollment, base_date):
     # 7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，
     # 以及与课程持续时间的比例
     XU = UT.groupby('course_id')\
-        .agg({'duration': [np.average, np.std, np.max, np.min],
-              'duration_ratio': [np.average, np.std, np.max, np.min]})\
-        .reset_index()
+        .agg({
+            'duration': [np.nanmean, np.nanstd, np.nanmax, np.nanmin],
+            'duration_ratio': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]
+            }).reset_index()
 
     logger.debug('7~14')
 
     op_time = log_all.groupby(['enrollment_id', 'object'])\
-        .agg({'time': np.min}).reset_index()
+        .agg({'time': np.nanmin}).reset_index()
     op_time = pd.merge(op_time, enroll_all, how='left', on='enrollment_id')
-    op_time = pd.merge(op_time, obj_all.rename(columns={'module_id': 'object'}),
+    op_time = pd.merge(op_time,
+                       obj_all.rename(columns={'module_id': 'object'}),
                        how='left', on=['course_id', 'object'])
     op_time['delay'] = (op_time['time'] - op_time['start']).dt.days
     import events
@@ -132,13 +135,17 @@ def extract(enrollment, base_date):
     # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：
     # 平均值、标准差、最大值、最小值，enrollment最后一周、倒数第二周、第一周、总体
     XO_last_week = op_last_week.groupby('enrollment_id')\
-        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .reset_index()
     XO_2nd_last_week = op_2nd_last_week.groupby('enrollment_id')\
-        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .reset_index()
     XO_first_week = op_first_week.groupby('enrollment_id')\
-        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .reset_index()
     XO_all = op_time.groupby('enrollment_id')\
-        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .reset_index()
 
     logger.debug('17~32')
 
