@@ -55,20 +55,7 @@ def extract(enrollment, base_date):
 
     logger.debug('datasets prepared')
 
-    course_time = obj_all[~pd.isnull(obj_all['start'])].groupby('course_id')\
-        .agg({'start': [np.min, np.max]})
-    course_time.columns = ['st_c', 'et_c']
-    course_time.reset_index(inplace=True)
-    # first and last event time of course
-    course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id')\
-        .groupby('course_id').agg({'time': [np.min, np.max]})
-    course_t.columns = ['st', 'et']
-    course_t.reset_index(inplace=True)
-    CT = pd.merge(course_t, course_time, how='left', on='course_id')
-    CT.ix[CT['st_c'] < CT['st'], 'st'] = CT.ix[CT['st_c'] < CT['st'], 'st_c']
-    CT.ix[CT['et_c'] > CT['et'], 'et'] = CT.ix[CT['et_c'] > CT['et'], 'et_c']
-    del CT['st_c']
-    del CT['et_c']
+    CT = course_duration(log_all, obj_all, enroll_all)
 
     # 0~1: 课程材料首次发布、最近发布距今几天
     XC = CT.copy()
@@ -181,3 +168,22 @@ def extract(enrollment, base_date):
     IO.cache(X, pkl_path)
 
     return X
+
+
+def course_duration(log_all, obj_all, enroll_all):
+    course_time = obj_all[~pd.isnull(obj_all['start'])].groupby('course_id')\
+        .agg({'start': [np.min, np.max]})
+    course_time.columns = ['st_c', 'et_c']
+    course_time.reset_index(inplace=True)
+    # first and last event time of course
+    course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id')\
+        .groupby('course_id').agg({'time': [np.min, np.max]})
+    course_t.columns = ['st', 'et']
+    course_t.reset_index(inplace=True)
+    CT = pd.merge(course_t, course_time, how='left', on='course_id')
+    CT.ix[CT['st_c'] < CT['st'], 'st'] = CT.ix[CT['st_c'] < CT['st'], 'st_c']
+    CT.ix[CT['et_c'] > CT['et'], 'et'] = CT.ix[CT['et_c'] > CT['et'], 'et_c']
+    del CT['st_c']
+    del CT['et_c']
+
+    return CT
