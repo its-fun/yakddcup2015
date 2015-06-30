@@ -8,6 +8,10 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 0. 处理NAs
 
+0. time_related.py中，关于“用户对课程材料的首次操作时间与课程材料发布时间的日期差”，
+其中课程材料发布时间可以这么找：材料的发布时间如果是NaT，那么就是首先对这个材料进行操作的
+时间
+
 1. 特征选择与normalize
 
 2. 手工加入规则，比如关于课程最近更新时间、用户最近操作时间
