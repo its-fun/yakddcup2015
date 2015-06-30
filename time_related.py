@@ -67,16 +67,19 @@ def extract(enrollment, base_date):
     ET = log_all.groupby('enrollment_id').agg({'time': [np.min, np.max]})
     ET.columns = ['st_e', 'et_e']
     ET.reset_index(inplace=True)
-    ET['d'] = (ET['et_e'] - ET['st_e']).dt.days
+    ET['duration'] = (ET['et_e'] - ET['st_e']).dt.days
     ET = pd.merge(ET, enroll_all, how='left', on='enrollment_id')
     ET = pd.merge(ET, CT, how='left', on='course_id')
-    ET['f'] = (ET['st_e'] - ET['st']).dt.days
+    ET['first_op'] = (ET['st_e'] - ET['st']).dt.days
+    ET['first_month'] = ET['st_e'].dt.month
+    ET['last_month'] = ET['et_e'].dt.month
     del ET['username']
     del ET['course_id']
     del ET['st']
     del ET['et']
 
     # 2~5: 用户初次、上次操作此课程据今几天，持续几天，初次访问课程材料距离开课时间几天
+    # 14~15: month (1-12) of the first, last event in the enrollment
     XE = ET.copy()
     XE['st_e'] = (base_date - XE['st_e']).dt.days
     XE['et_e'] = (base_date - XE['et_e']).dt.days
