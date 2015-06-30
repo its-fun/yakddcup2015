@@ -77,7 +77,7 @@ def extract(enrollment, base_date):
 
     logger.debug('0~1')
 
-    ET = log_all.groupby('enrollment_id').agg({'time': [np.nanmin, np.nanmax]})
+    ET = log_all.groupby('enrollment_id').agg({'time': [np.min, np.max]})
     ET.columns = ['st_e', 'et_e']
     ET.reset_index(inplace=True)
     ET['duration'] = (ET['et_e'] - ET['st_e']).dt.days
@@ -105,16 +105,15 @@ def extract(enrollment, base_date):
 
     # 7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，
     # 以及与课程持续时间的比例
-    XU = UT.groupby('course_id')\
-        .agg({
-            'duration': [np.nanmean, np.nanstd, np.nanmax, np.nanmin],
-            'duration_ratio': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]
+    XU = UT.groupby('course_id').agg({
+            'duration': [np.average, np.std, np.max, np.min],
+            'duration_ratio': [np.average, np.std, np.max, np.min]
             }).reset_index()
 
     logger.debug('7~14')
 
     op_time = log_all.groupby(['enrollment_id', 'object'])\
-        .agg({'time': np.nanmin}).reset_index()
+        .agg({'time': np.min}).reset_index()
     op_time = pd.merge(op_time, enroll_all, how='left', on='enrollment_id')
     op_time = pd.merge(op_time,
                        obj_all.rename(columns={'module_id': 'object'}),
