@@ -263,6 +263,8 @@ def extract(enrollment, base_date):
     del X['username']
     del X['course_id']
 
+    X.fillna(0, inplace=True)
+
     check_dataframe(X, 'X')
     X = X.as_matrix()
 
