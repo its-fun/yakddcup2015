@@ -60,4 +60,9 @@ def extract(enrollment, base_date):
     CT['st'] = (base_date - CT['st']).dt.days
     CT['et'] = (base_date - CT['et']).dt.days
 
+    # 0~1: 课程材料首次发布、最近发布距今几天
+    logger.debug('0~1')
+
+
+
     return None
