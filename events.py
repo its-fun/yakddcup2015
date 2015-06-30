@@ -130,8 +130,8 @@ def extract(enrollment, base_date):
         import warnings
         warnings.simplefilter('ignore', np.RankWarning)
         return pd.Series(
-            [linregress(x, c)[0], np.nanmean(c), np.nanstd(c), np.nanmax(c),
-             np.nanmin(c), p[1], p[0]],
+            [linregress(x, c)[0], np.mean(c), np.std(c), np.max(c),
+             np.min(c), p[1], p[0]],
             index=['slope', 'mean', 'std', 'max', 'min', 'b', 'c'])
 
     # 113: trending slope of the weekly number of events within the enrollment
@@ -141,7 +141,7 @@ def extract(enrollment, base_date):
     # where x is week number (all start from 0), and y is the weekly number of
     # events
     W_stats = log_all.groupby(['enrollment_id', 'week_diff'])\
-        .agg({'count': np.nansum}).reset_index().groupby('enrollment_id')\
+        .agg({'count': np.sum}).reset_index().groupby('enrollment_id')\
         .apply(f)
     W_stats.fillna(0, inplace=True)
     W_stats.ix[np.isinf(W_stats['c']), 'c'] = np.nanmax(
@@ -153,7 +153,7 @@ def extract(enrollment, base_date):
     log_all['hour'] = log_all['time'].dt.hour
 
     week_day_counts = log_all.groupby(['enrollment_id', 'week_day'])\
-        .agg({'count': np.nansum}).reset_index()
+        .agg({'count': np.sum}).reset_index()
     week_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
                  'Saturday', 'Sunday']
     for i, wd in enumerate(week_days):
@@ -164,12 +164,12 @@ def extract(enrollment, base_date):
     del week_day_counts['count']
 
     # 132~138: 7 counts of events in Monday to Sunday
-    WD = week_day_counts.groupby('enrollment_id').agg(np.nansum).reset_index()
+    WD = week_day_counts.groupby('enrollment_id').agg(np.sum).reset_index()
 
     logger.debug('132~138')
 
     hour_counts = log_all.groupby(['enrollment_id', 'hour'])\
-        .agg({'count': np.nansum}).reset_index()
+        .agg({'count': np.sum}).reset_index()
     for i in range(24):
         c = str(i)
         hour_counts[c] = 0
@@ -179,12 +179,12 @@ def extract(enrollment, base_date):
     del hour_counts['count']
 
     # 139~162: 24 counts of events in hour 0-23
-    H = hour_counts.groupby('enrollment_id').agg(np.nansum).reset_index()
+    H = hour_counts.groupby('enrollment_id').agg(np.sum).reset_index()
 
     logger.debug('139~162')
 
     event_counts = log_all.groupby(['enrollment_id', 'event'])\
-        .agg({'count': np.nansum}).reset_index()
+        .agg({'count': np.sum}).reset_index()
     event_types = ['access', 'page_close', 'problem', 'video', 'discussion',
                    'navigate', 'wiki']
     for e in event_types:
@@ -195,7 +195,7 @@ def extract(enrollment, base_date):
     del event_counts['count']
 
     # 163~169: 7 counts of event types
-    E = event_counts.groupby('enrollment_id').agg(np.nansum).reset_index()
+    E = event_counts.groupby('enrollment_id').agg(np.sum).reset_index()
 
     logger.debug('163~169')
 
@@ -209,7 +209,7 @@ def extract(enrollment, base_date):
     del source_counts['count']
 
     # 170~171: 2 counts of source types
-    S = source_counts.groupby('enrollment_id').agg(np.nansum).reset_index()
+    S = source_counts.groupby('enrollment_id').agg(np.sum).reset_index()
 
     logger.debug('170~171')
 
@@ -341,19 +341,19 @@ def count_source_event(log, enroll_all):
     others are total counts of respective kinds of events of the course
     """
     counts = log.groupby(['enrollment_id', 'source_event'])\
-        .agg({'count': np.nansum}).reset_index()
+        .agg({'count': np.sum}).reset_index()
     for se in SE_PAIRS:
         counts[se] = 0
         counts.loc[counts['source_event'] == se, se] += \
             counts[counts['source_event'] == se]['count']
     del counts['source_event']
-    E = counts.groupby(['enrollment_id']).agg(np.nansum).reset_index()
+    E = counts.groupby(['enrollment_id']).agg(np.sum).reset_index()
 
     E_with_UC = pd.merge(E, enroll_all, how='left', on='enrollment_id')
-    U = E_with_UC.groupby('username').agg(np.nansum).reset_index()
+    U = E_with_UC.groupby('username').agg(np.sum).reset_index()
     del U['enrollment_id']
 
-    C = E_with_UC.groupby('course_id').agg(np.nansum).reset_index()
+    C = E_with_UC.groupby('course_id').agg(np.sum).reset_index()
     del C['enrollment_id']
 
     return E, U, C
@@ -363,6 +363,6 @@ def count_source_event(log, enroll_all):
 def enroll_duration():
     log_all = IO.load_logs()
     enroll_t = log_all.groupby('enrollment_id')\
-        .agg({'time': [np.nanmin, np.nanmax]})
+        .agg({'time': [np.min, np.max]})
     enroll_t.columns = ['st', 'et']
     return enroll_t.reset_index()
