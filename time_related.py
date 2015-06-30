@@ -175,4 +175,3 @@ def extract(enrollment, base_date):
     IO.cache(X, pkl_path)
 
     return X
-
