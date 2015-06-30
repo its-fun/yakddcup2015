@@ -103,7 +103,7 @@ defined sessions in the enrollment (4)
 
 ### Dropout：连续十天无操作 (11)
 
-+ 课程最后十天无操作的人数，与选课人数的比例 (2)
++ 课程最后十天有操作的人数，与选课人数的比例 (2)
 
 + 用户平均每个课程Dropout的次数，在该课程中Dropout的次数，与平均每个课程Dropout次数的比例；总Dropout持续时长与课程持续时间的比例 (4)
 
