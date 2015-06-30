@@ -64,10 +64,8 @@ def extract(enrollment, base_date):
     course_t.columns = ['st', 'et']
     course_t.reset_index(inplace=True)
     CT = pd.merge(course_t, course_time, how='left', on='course_id')
-    CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st'] = \
-        CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st_c']
-    CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et'] = \
-        CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et_c']
+    CT.ix[CT['st_c'] < CT['st'], 'st'] = CT.ix[CT['st_c'] < CT['st'], 'st_c']
+    CT.ix[CT['et_c'] > CT['et'], 'et'] = CT.ix[CT['et_c'] > CT['et'], 'et_c']
     del CT['st_c']
     del CT['et_c']
 
@@ -116,7 +114,7 @@ def extract(enrollment, base_date):
     op_time = log_all.groupby(['enrollment_id', 'object'])\
         .agg({'time': np.min}).reset_index()
     op_time = pd.merge(op_time, enroll_all, how='left', on='enrollment_id')
-    op_time = pd.merge(op_time, obj_all.rename({'module_id': 'object'}),
+    op_time = pd.merge(op_time, obj_all.rename(columns={'module_id': 'object'}),
                        how='left', on=['course_id', 'object'])
     op_time['delay'] = (op_time['time'] - op_time['start']).dt.days
     import events
