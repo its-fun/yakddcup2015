@@ -57,12 +57,30 @@ def extract(enrollment, base_date):
     CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et'] = CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et_c']
     del CT['st_c']
     del CT['et_c']
-    CT['st'] = (base_date - CT['st']).dt.days
-    CT['et'] = (base_date - CT['et']).dt.days
 
     # 0~1: 课程材料首次发布、最近发布距今几天
+    XC = CT.copy()
+    XC['st'] = (base_date - XC['st']).dt.days
+    XC['et'] = (base_date - XC['et']).dt.days
     logger.debug('0~1')
 
+    ET = log_all.groupby('enrollment_id').agg({'time': [np.min, np.max]})
+    ET.columns = ['st_e', 'et_e']
+    ET.reset_index(inplace=True)
+    ET['d'] = (ET['et_e'] - ET['st_e']).dt.days
+    ET = pd.merge(ET, enroll_all, how='left', on='enrollment_id')
+    ET = pd.merge(ET, CT, how='left', on='course_id')
+    ET['f'] = (ET['st_e'] - ET['st']).dt.days
+    del ET['username']
+    del ET['course_id']
+    del ET['st']
+    del ET['et']
 
+    # 2~5: 用户初次、上次操作此课程据今几天，持续几天，初次访问课程材料距离开课时间几天
+    XE = ET.copy()
+    XE['st_e'] = (base_date - XE['st_e']).dt.days
+    XE['et_e'] = (base_date - XE['et_e']).dt.days
+
+    logger.debug('2~5')
 
     return None
