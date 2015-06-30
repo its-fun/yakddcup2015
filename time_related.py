@@ -7,13 +7,13 @@ Total: 32
 
 0~1: 课程材料首次发布、最近发布距今几天
 
-2~5: 用户初次、上次操作此课程据今几天，持续几天，初次访问课程材料距离开课时间几天
+2~6: 用户初次、上次操作此课程据今几天，持续几天，与课程持续时间的比例，初次访问课程材料距离开课时间几天
 
-6~13: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，以及与课程持续时间的比例
+7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，以及与课程持续时间的比例
 
-14~15: month (1-12) of the first, last event in the enrollment
+15~16: month (1-12) of the first, last event in the enrollment
 
-16~31: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，
+17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，
 enrollment最后一周、倒数第二周、第一周、总体
 """
 
@@ -70,6 +70,8 @@ def extract(enrollment, base_date):
     ET['duration'] = (ET['et_e'] - ET['st_e']).dt.days
     ET = pd.merge(ET, enroll_all, how='left', on='enrollment_id')
     ET = pd.merge(ET, CT, how='left', on='course_id')
+    ET['duration_ratio'] = (ET['et'] - ET['st']).dt.days
+    ET['duration_ratio'] = ET['duration'] / ET['duration_ratio']
     ET['first_op'] = (ET['st_e'] - ET['st']).dt.days
     ET['first_month'] = ET['st_e'].dt.month
     ET['last_month'] = ET['et_e'].dt.month
@@ -78,12 +80,12 @@ def extract(enrollment, base_date):
     del ET['st']
     del ET['et']
 
-    # 2~5: 用户初次、上次操作此课程据今几天，持续几天，初次访问课程材料距离开课时间几天
-    # 14~15: month (1-12) of the first, last event in the enrollment
+    # 2~6: 用户初次、上次操作此课程据今几天，持续几天，与课程持续时间的比例，初次访问课程材料距离开课时间几天
+    # 15~16: month (1-12) of the first, last event in the enrollment
     XE = ET.copy()
     XE['st_e'] = (base_date - XE['st_e']).dt.days
     XE['et_e'] = (base_date - XE['et_e']).dt.days
 
-    logger.debug('2~5, 14~15')
+    logger.debug('2~6, 15~16')
 
     return None
