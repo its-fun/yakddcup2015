@@ -37,6 +37,7 @@ events
 
 import logging
 import sys
+import os
 from datetime import timedelta
 
 import numpy as np
@@ -49,7 +50,7 @@ import Path
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(os.path.basename(__file__))
 
 
 SE_PAIRS = ['browser-access', 'browser-page_close', 'browser-problem',

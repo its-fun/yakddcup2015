@@ -20,20 +20,30 @@ enrollment最后一周、倒数第二周、第一周、总体
 
 import logging
 import sys
+import os
 from datetime import timedelta
 
 import numpy as np
 import pandas as pd
 
 import IO
+import Util
+import Path
 
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(os.path.basename(__file__))
 
 
 def extract(enrollment, base_date):
+    pkl_path = Path.of_cache('time_related.%s.pkl' % base_date)
+    X = IO.fetch_cache(pkl_path)
+    if X is not None:
+        logger.debug('cache hit')
+        return X
+
+    logger.debug('cache missed')
     logger.debug('prepare datasets ...')
 
     enroll_all = IO.load_enrollments()
@@ -49,12 +59,15 @@ def extract(enrollment, base_date):
     course_time.columns = ['st_c', 'et_c']
     course_time.reset_index(inplace=True)
     # first and last event time of course
-    course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id').groupby('course_id').agg({'time': [np.min, np.max]})
+    course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id')\
+        .groupby('course_id').agg({'time': [np.min, np.max]})
     course_t.columns = ['st', 'et']
     course_t.reset_index(inplace=True)
-    CT = pd.merge(enroll_t, course_time, how='left', on='course_id')
-    CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st'] = CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st_c']
-    CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et'] = CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et_c']
+    CT = pd.merge(course_t, course_time, how='left', on='course_id')
+    CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st'] = \
+        CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st_c']
+    CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et'] = \
+        CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et_c']
     del CT['st_c']
     del CT['et_c']
 
@@ -62,6 +75,7 @@ def extract(enrollment, base_date):
     XC = CT.copy()
     XC['st'] = (base_date - XC['st']).dt.days
     XC['et'] = (base_date - XC['et']).dt.days
+
     logger.debug('0~1')
 
     ET = log_all.groupby('enrollment_id').agg({'time': [np.min, np.max]})
@@ -90,13 +104,18 @@ def extract(enrollment, base_date):
     logger.debug('2~6, 15~16')
 
     # 7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，以及与课程持续时间的比例
-    XU = UT.groupby('course_id').agg({'duration': [np.average, np.std, np.max, np.min], 'duration_ratio': [np.average, np.std, np.max, np.min]}).reset_index()
+    XU = UT.groupby('course_id')\
+        .agg({'duration': [np.average, np.std, np.max, np.min],
+              'duration_ratio': [np.average, np.std, np.max, np.min]})\
+        .reset_index()
 
     logger.debug('7~14')
 
-    op_time = log_all.groupby(['enrollment_id', 'object']).agg({'time': np.min}).reset_index()
+    op_time = log_all.groupby(['enrollment_id', 'object'])\
+        .agg({'time': np.min}).reset_index()
     op_time = pd.merge(op_time, enroll_all, how='left', on='enrollment_id')
-    op_time = pd.merge(op_time, obj_all.rename({'module_id': 'object'}), how='left', on=['course_id', 'object'])
+    op_time = pd.merge(op_time, obj_all.rename({'module_id': 'object'}),
+                       how='left', on=['course_id', 'object'])
     op_time['delay'] = (op_time['time'] - op_time['start']).dt.days
     import events
     op_time = pd.merge(op_time, events.enroll_duration(), how='left',
@@ -112,12 +131,48 @@ def extract(enrollment, base_date):
 
     # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，
     # enrollment最后一周、倒数第二周、第一周、总体
-    XO_last_week = op_last_week.groupby('enrollment_id').agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
-    XO_2nd_last_week = op_2nd_last_week.groupby('enrollment_id').agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
-    XO_first_week = op_first_week.groupby('enrollment_id').agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
-    XO_all = op_time.groupby('enrollment_id').agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+    XO_last_week = op_last_week.groupby('enrollment_id')\
+        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+    XO_2nd_last_week = op_2nd_last_week.groupby('enrollment_id')\
+        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+    XO_first_week = op_first_week.groupby('enrollment_id')\
+        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
+    XO_all = op_time.groupby('enrollment_id')\
+        .agg({'delay': [np.average, np.std, np.max, np.min]}).reset_index()
 
     logger.debug('17~32')
 
-    return None
+    check_dataframe = Util.dataframe_checker(logger)
+
+    check_dataframe(XC, 'XC')
+    X = pd.merge(enrollment, XC, how='left', on='course_id')
+
+    check_dataframe(XE, 'XE')
+    X = pd.merge(X, XE, how='left', on='enrollment_id')
+
+    check_dataframe(XU, 'XU')
+    X = pd.merge(X, XU, how='left', on='course_id')
+
+    check_dataframe(XO_last_week, 'XO_last_week')
+    X = pd.merge(X, XO_last_week, how='left', on='enrollment_id')
+
+    check_dataframe(XO_2nd_last_week, 'XO_2nd_last_week')
+    X = pd.merge(X, XO_2nd_last_week, how='left', on='enrollment_id')
+
+    check_dataframe(XO_first_week, 'XO_first_week')
+    X = pd.merge(X, XO_first_week, how='left', on='enrollment_id')
+
+    check_dataframe(XO_all, 'XO_all')
+    X = pd.merge(X, XO_all, how='left', on='enrollment_id')
+
+    del X['enrollment_id']
+    del X['username']
+    del X['course_id']
+
+    check_dataframe(X, 'X')
+    X = X.as_matrix()
+
+    IO.cache(X, pkl_path)
+
+    return X
 

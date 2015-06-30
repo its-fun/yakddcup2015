@@ -17,7 +17,7 @@ Total: 11
 
 import logging
 import sys
-import multiprocessing as par
+import os
 
 import numpy as np
 import pandas as pd
@@ -27,7 +27,7 @@ import IO
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(os.path.basename(__file__))
 
 
 def extract(enrollment, base_date):
