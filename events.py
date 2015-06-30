@@ -218,8 +218,7 @@ def extract(enrollment, base_date):
     check_dataframe = Util.dataframe_checker(logger)
 
     check_dataframe(EUC_last_week, 'EUC_last_week')
-    X = pd.merge(enrollment[['enrollment_id']], EUC_last_week, how='left',
-                 on='enrollment_id')
+    X = pd.merge(enrollment, EUC_last_week, how='left', on='enrollment_id')
 
     check_dataframe(EUC_2nd_last_week, 'EUC_2nd_last_week')
     X = pd.merge(X, EUC_2nd_last_week, how='left', on='enrollment_id')
@@ -261,6 +260,8 @@ def extract(enrollment, base_date):
     X = pd.merge(X, S, how='left', on='enrollment_id')
 
     del X['enrollment_id']
+    del X['username']
+    del X['course_id']
 
     check_dataframe(X, 'X')
     X = X.as_matrix()
