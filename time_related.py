@@ -41,7 +41,23 @@ def extract(enrollment, base_date):
     obj_all = IO.load_object()
 
     log_all = log_all[log_all['time'] <= base_date]
+    obj_all = obj_all[obj_all['start'] <= base_date]
 
     logger.debug('datasets prepared')
+
+    course_time = obj_all.groupby('course_id').agg({'start': [np.min, np.max]})
+    course_time.columns = ['st_c', 'et_c']
+    course_time.reset_index(inplace=True)
+    # first and last event time of course
+    course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id').groupby('course_id').agg({'time': [np.min, np.max]})
+    course_t.columns = ['st', 'et']
+    course_t.reset_index(inplace=True)
+    CT = pd.merge(enroll_t, course_time, how='left', on='course_id')
+    CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st'] = CT.ix[(~np.isnan(CT['st_c'])) & (CT['st_c'] < CT['st']), 'st_c']
+    CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et'] = CT.ix[(~np.isnan(CT['et_c'])) & (CT['et_c'] > CT['et']), 'et_c']
+    del CT['st_c']
+    del CT['et_c']
+    CT['st'] = (base_date - CT['st']).dt.days
+    CT['et'] = (base_date - CT['et']).dt.days
 
     return None
