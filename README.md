@@ -19,7 +19,7 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 5. AdaBoost, RF, Bagging, Blending
 
 
-## Features (260)
+## Features (261)
 
 ### Event (172)
 
@@ -88,11 +88,11 @@ defined sessions in the enrollment (4)
 + statistics of 7-day defined sessions: mean, std, max, min of duration (4)
 
 
-### 时间相关 (32)
+### 时间相关 (33)
 
 + 课程材料首次发布、最近发布距今几天 (2)
 
-+ 用户初次、上次操作此课程据今几天，持续几天，初次访问课程材料距离开课时间几天 (4)
++ 用户初次、上次操作此课程据今几天，持续几天，与课程持续时间的比例，初次访问课程材料距离开课时间几天 (5)
 
 + 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，以及与课程持续时间的比例 (8)
 
