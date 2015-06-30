@@ -94,21 +94,21 @@ def extract(enrollment, base_date):
 
     logger.debug('7~14')
 
+    op_time = log_all.groupby(['enrollment_id', 'object']).agg({'time': np.min}).reset_index()
+    op_time = pd.merge(op_time, enroll_all, how='left', on='enrollment_id')
+    op_time = pd.merge(op_time, obj_all.rename({'module_id': 'object'}), how='left', on=['course_id', 'object'])
+    op_time['delay'] = (op_time['time'] - op_time['start']).dt.days
     import events
-    enroll_t = events.enroll_duration()
-    enroll_t.columns = ['enrollment_id', 'st_e', 'et_e']
-    log_all = pd.merge(log_all, enroll_t, how='left',
+    op_time = pd.merge(op_time, events.enroll_duration(), how='left',
                        on='enrollment_id')
-    log_all = pd.merge(log_all, enroll_all, how='left', on='enrollment_id')
-    log_all = pd.merge(log_all, CT, how='left', on='course_id')
 
-    log_last_week = log_all[
-        log_all['time'] > log_all['et_e'] - timedelta(days=7)].copy()
-    log_2nd_last_week = log_all[
-        (log_all['time'] > log_all['et_e'] - timedelta(days=14)) &
-        (log_all['time'] <= log_all['et_e'] - timedelta(days=7))].copy()
-    log_first_week = log_all[
-        log_all['time'] < log_all['st_e'] + timedelta(days=7)].copy()
+    op_last_week = op_time[
+        op_time['time'] > op_time['et'] - timedelta(days=7)].copy()
+    op_2nd_last_week = op_time[
+        (op_time['time'] > op_time['et'] - timedelta(days=14)) &
+        (op_time['time'] <= op_time['et'] - timedelta(days=7))].copy()
+    op_first_week = op_time[
+        op_time['time'] < op_time['st'] + timedelta(days=7)].copy()
 
     # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：平均值、标准差、最大值、最小值，
     # enrollment最后一周、倒数第二周、第一周、总体
