@@ -60,3 +60,4 @@ target/
 data/
 .ipynb_checkpoints/
 *.ipynb
+/.DS_Store
