@@ -55,13 +55,13 @@ def extract(enrollment, base_date):
 
     logger.debug('datasets prepared')
 
-    course_time = obj_all.groupby('course_id')\
-        .agg({'start': [np.nanmin, np.nanmax]})
+    course_time = obj_all[~pd.isnull(obj_all['start'])].groupby('course_id')\
+        .agg({'start': [np.min, np.max]})
     course_time.columns = ['st_c', 'et_c']
     course_time.reset_index(inplace=True)
     # first and last event time of course
     course_t = pd.merge(log_all, enroll_all, how='left', on='enrollment_id')\
-        .groupby('course_id').agg({'time': [np.nanmin, np.nanmax]})
+        .groupby('course_id').agg({'time': [np.min, np.max]})
     course_t.columns = ['st', 'et']
     course_t.reset_index(inplace=True)
     CT = pd.merge(course_t, course_time, how='left', on='course_id')

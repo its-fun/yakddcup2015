@@ -231,19 +231,19 @@ def extract(enrollment, base_date):
     X = pd.merge(X, EUC_all, how='left', on='enrollment_id')
 
     check_dataframe(C_last_week, 'C_last_week')
-    X = pd.merge(X, C_last_week, how='left', on='enrollment_id')
+    X = pd.merge(X, C_last_week, how='left', on='username')
 
     check_dataframe(C_2nd_last_week, 'C_2nd_last_week')
-    X = pd.merge(X, C_2nd_last_week, how='left', on='enrollment_id')
+    X = pd.merge(X, C_2nd_last_week, how='left', on='username')
 
     check_dataframe(C_first_week, 'C_first_week')
-    X = pd.merge(X, C_first_week, how='left', on='enrollment_id')
+    X = pd.merge(X, C_first_week, how='left', on='username')
 
     check_dataframe(C_all, 'C_all')
-    X = pd.merge(X, C_all, how='left', on='enrollment_id')
+    X = pd.merge(X, C_all, how='left', on='username')
 
     check_dataframe(U_count, 'U_count')
-    X = pd.merge(X, U_count, how='left', on='enrollment_id')
+    X = pd.merge(X, U_count, how='left', on='course_id')
 
     check_dataframe(W_stats, 'W_stats')
     X = pd.merge(X, W_stats, how='left', on='enrollment_id')
