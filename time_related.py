@@ -84,6 +84,6 @@ def extract(enrollment, base_date):
     XE['st_e'] = (base_date - XE['st_e']).dt.days
     XE['et_e'] = (base_date - XE['et_e']).dt.days
 
-    logger.debug('2~5')
+    logger.debug('2~5, 14~15')
 
     return None
