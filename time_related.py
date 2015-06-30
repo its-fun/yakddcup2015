@@ -75,10 +75,11 @@ def extract(enrollment, base_date):
     ET['first_op'] = (ET['st_e'] - ET['st']).dt.days
     ET['first_month'] = ET['st_e'].dt.month
     ET['last_month'] = ET['et_e'].dt.month
-    del ET['username']
-    del ET['course_id']
+    UT = ET.copy()
     del ET['st']
     del ET['et']
+    del ET['username']
+    del ET['course_id']
 
     # 2~6: 用户初次、上次操作此课程据今几天，持续几天，与课程持续时间的比例，初次访问课程材料距离开课时间几天
     # 15~16: month (1-12) of the first, last event in the enrollment
@@ -87,5 +88,12 @@ def extract(enrollment, base_date):
     XE['et_e'] = (base_date - XE['et_e']).dt.days
 
     logger.debug('2~6, 15~16')
+
+    # 7~14: 课程的所有用户操作课程持续时间的：平均值、标准差、最大值、最小值，以及与课程持续时间的比例
+    XU = UT.groupby('course_id').agg({'duration': [np.average, np.std, np.max, np.min], 'duration_ratio': [np.average, np.std, np.max, np.min]}).reset_index()
+
+    logger.debug('7~14')
+
+
 
     return None
