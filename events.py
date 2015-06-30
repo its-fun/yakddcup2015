@@ -142,7 +142,7 @@ def extract(enrollment, base_date):
     # events
     W_stats = log_all.groupby(['enrollment_id', 'week_diff'])\
         .agg({'count': np.sum}).reset_index().groupby('enrollment_id')\
-        .apply(f)
+        .apply(f).reset_index()
     W_stats.fillna(0, inplace=True)
     W_stats.ix[np.isinf(W_stats['c']), 'c'] = np.nanmax(
         W_stats[~np.isinf(W_stats['c'])])
