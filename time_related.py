@@ -132,16 +132,16 @@ def extract(enrollment, base_date):
     # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：
     # 平均值、标准差、最大值、最小值，enrollment最后一周、倒数第二周、第一周、总体
     XO_last_week = op_last_week.groupby('enrollment_id')\
-        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .agg({'delay': [np.average, np.std, np.max, np.min]})\
         .reset_index()
     XO_2nd_last_week = op_2nd_last_week.groupby('enrollment_id')\
-        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .agg({'delay': [np.average, np.std, np.max, np.min]})\
         .reset_index()
     XO_first_week = op_first_week.groupby('enrollment_id')\
-        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .agg({'delay': [np.average, np.std, np.max, np.min]})\
         .reset_index()
     XO_all = op_time.groupby('enrollment_id')\
-        .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
+        .agg({'delay': [np.average, np.std, np.max, np.min]})\
         .reset_index()
 
     logger.debug('17~32')
