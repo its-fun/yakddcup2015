@@ -64,7 +64,9 @@ def extract(enrollment, base_date):
     course_t2.columns = ['st2', 'et2']
     course_t2.reset_index(inplace=True)
 
-    log_all_t = pd.merge(log_all, course_t1, how='left', on='course_id')
+    log_all_t = pd.merge(
+        pd.merge(log_all, enroll_all, how='left', on='enrollment_id'),
+        course_t1, how='left', on='course_id')
     log_all_t = pd.merge(log_all_t, course_t2, how='left', on='course_id')
 
     remain_log1 = log_all_t[
