@@ -105,6 +105,17 @@ def extract(enrollment, base_date):
     op_time = pd.merge(op_time,
                        obj_all.rename(columns={'module_id': 'object'}),
                        how='left', on=['course_id', 'object'])
+
+    first_op_time = pd.merge(log_all, enroll_all, how='left',
+                             on='enrollment_id')\
+        .groupby(['course_id', 'object']).agg({'time': np.min}).reset_index()
+    first_op_time.rename(columns={'time': 'first_op_time'}, inplace=True)
+
+    op_time = pd.merge(op_time, first_op_time, how='left',
+                       on=['course_id', 'object'])
+    op_time.ix[pd.isnull(op_time['start']), 'start'] = \
+        op_time.ix[pd.isnull(op_time['start']), 'first_op_time']
+
     op_time['delay'] = (op_time['time'] - op_time['start']).dt.days
     import events
     op_time = pd.merge(op_time, events.enroll_duration(), how='left',
