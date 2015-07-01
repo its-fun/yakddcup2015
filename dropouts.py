@@ -123,7 +123,8 @@ def extract(enrollment, base_date):
     # 7~11: 用户在所有课程上Dropout总持续时长与课程持续时间的比例的：
     # 平均值、方差、最大值、最小值；有Dropout行为的课程占用户所选课程总数的比例
     X2 = D_count.groupby('username')\
-        .agg({'dt_ratio': [np.average, np.std, np.max, np.min]}).reset_index()
+        .agg({'dt_ratio': [np.average, np.std, np.max, np.min]})\
+        .rename(columns=lambda cs: '_'.join(cs)).reset_index()
     DC_count = D_count[D_count['dropout_count'] > 0].groupby('username')\
         .agg({'course_id': lambda cs: len(np.unique(cs))})\
         .rename(columns={'course_id': 'd_course'}).reset_index()

@@ -95,7 +95,7 @@ def extract(enrollment, base_date):
     XU = UT.groupby('course_id').agg({
             'duration': [np.average, np.std, np.max, np.min],
             'duration_ratio': [np.average, np.std, np.max, np.min]
-            }).reset_index()
+            }).rename(columns=lambda cs: '_'.join(cs)).reset_index()
 
     logger.debug('7~14')
 
@@ -133,16 +133,16 @@ def extract(enrollment, base_date):
     # 平均值、标准差、最大值、最小值，enrollment最后一周、倒数第二周、第一周、总体
     XO_last_week = op_last_week.groupby('enrollment_id')\
         .agg({'delay': [np.average, np.std, np.max, np.min]})\
-        .reset_index()
+        .rename(columns=lambda cs: '_'.join(cs)).reset_index()
     XO_2nd_last_week = op_2nd_last_week.groupby('enrollment_id')\
         .agg({'delay': [np.average, np.std, np.max, np.min]})\
-        .reset_index()
+        .rename(columns=lambda cs: '_'.join(cs)).reset_index()
     XO_first_week = op_first_week.groupby('enrollment_id')\
         .agg({'delay': [np.average, np.std, np.max, np.min]})\
-        .reset_index()
+        .rename(columns=lambda cs: '_'.join(cs)).reset_index()
     XO_all = op_time.groupby('enrollment_id')\
         .agg({'delay': [np.average, np.std, np.max, np.min]})\
-        .reset_index()
+        .rename(columns=lambda cs: '_'.join(cs)).reset_index()
 
     logger.debug('17~32')
 
