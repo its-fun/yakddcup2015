@@ -131,8 +131,6 @@ def extract(enrollment, base_date):
 
     # 17~32: 用户对课程材料的首次操作时间与课程材料发布时间的日期差的：
     # 平均值、标准差、最大值、最小值，enrollment最后一周、倒数第二周、第一周、总体
-    import warnings
-    warnings.simplefilter('default', RuntimeWarning)
     XO_last_week = op_last_week.groupby('enrollment_id')\
         .agg({'delay': [np.nanmean, np.nanstd, np.nanmax, np.nanmin]})\
         .reset_index()
