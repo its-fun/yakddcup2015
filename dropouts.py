@@ -129,8 +129,9 @@ def extract(enrollment, base_date):
     DC_count = D_count[D_count['dropout_count'] > 0].groupby('username')\
         .agg({'course_id': lambda cs: len(np.unique(cs))})\
         .rename(columns={'course_id': 'd_course'}).reset_index()
-    import events
-    UC_count = events.count_courses_by_user(log_all, enroll_all)
+    UC_count = log_all.groupby('username')\
+        .agg({'course_id': lambda cs: len(np.unique(cs))})\
+        .reset_index().rename(columns={'course_id': 'course_count'})
     X3 = pd.merge(DC_count, UC_count, how='left', on='username')
     X3['drop_course_ratio'] = X3['d_course'] / X3['course_count']
     del X3['d_course']
