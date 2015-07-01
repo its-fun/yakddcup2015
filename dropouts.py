@@ -124,7 +124,9 @@ def extract(enrollment, base_date):
     # 平均值、方差、最大值、最小值；有Dropout行为的课程占用户所选课程总数的比例
     X2 = D_count.groupby('username')\
         .agg({'dt_ratio': [np.average, np.std, np.max, np.min]})\
-        .reset_index().rename(columns=lambda c: ' '.join(c).strip())
+        .reset_index()
+    X2.columns = [' '.join(c).strip() for c in X2.columns.values]
+
     DC_count = D_count[D_count['dropout_count'] > 0].groupby('username')\
         .agg({'course_id': lambda cs: len(np.unique(cs))})\
         .rename(columns={'course_id': 'd_course'}).reset_index()
