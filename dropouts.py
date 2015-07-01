@@ -64,19 +64,18 @@ def extract(enrollment, base_date):
     course_t2.columns = ['st2', 'et2']
     course_t2.reset_index(inplace=True)
 
-    log_all_t = pd.merge(
+    log_all = pd.merge(
         pd.merge(log_all, enroll_all, how='left', on='enrollment_id'),
         course_t1, how='left', on='course_id')
-    log_all_t = pd.merge(log_all_t, course_t2, how='left', on='course_id')
+    log_all = pd.merge(log_all, course_t2, how='left', on='course_id')
 
-    remain_log1 = log_all_t[
-        log_all_t['time'] > log_all_t['et'] - timedelta(days=10)]
+    remain_log1 = log_all[log_all['time'] > log_all['et'] - timedelta(days=10)]
     remain_count_of_course1 = remain_log1.groupby('course_id')\
         .agg({'username': lambda us: len(np.unique(us))})\
         .reset_index().rename(columns={'username': 'remain_count1'})
 
-    remain_log2 = log_all_t[
-        log_all_t['time'] > log_all_t['et2'] - timedelta(days=10)]
+    remain_log2 = log_all[
+        log_all['time'] > log_all['et2'] - timedelta(days=10)]
     remain_count_of_course2 = remain_log2.groupby('course_id')\
         .agg({'username': lambda us: len(np.unique(us))})\
         .reset_index().rename(columns={'username': 'remain_count2'})
