@@ -61,6 +61,13 @@ logger = logging.getLogger(os.path.basename(__file__))
 
 
 def extract(base_date):
+    pkl_path = Path.of_cache('sessions.%s.pkl' % base_date)
+    X = IO.fetch_cache(pkl_path)
+    if X is not None:
+        logger.debug('cache hit')
+        return X
+
+    logger.debug('cache missed')
     logger.debug('prepare datasets ...')
 
     enroll_all = IO.load_enrollments()
@@ -152,6 +159,7 @@ def extract(base_date):
 
     X.fillna(0, inplace=True)
     check_dataframe(X, 'X')
+    IO.cache(X, pkl_path)
 
     return X
 
