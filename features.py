@@ -11,10 +11,6 @@ signature described as below:
 
 Args
 ----
-enrollment: pandas DataFrame
-Features of these enrollments will be generated. The columns should be:
-enrollment_id, username, course_id.
-
 base_date: datetime object
 Generated features are to predict user dropout bahaviour in the next 10 days
 after `base_date'.
@@ -22,9 +18,10 @@ after `base_date'.
 
 Returns
 -------
-X: numpy ndarray
+X: pandas DataFrame
 Extracted feature(s) of corresponding enrollments. Shape should be:
-(len(enrollment), n_features)
+(len(enrollment_all), n_features + 1)
+The extra first column should be enrollment_id
 """
 
 

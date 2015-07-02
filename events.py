@@ -58,7 +58,7 @@ SE_PAIRS = ['browser-access', 'browser-page_close', 'browser-problem',
             'server-navigate', 'server-problem', 'server-wiki']
 
 
-def extract(enrollment, base_date):
+def extract(base_date):
     pkl_path = Path.of_cache('events.%s.pkl' % base_date)
     X = IO.fetch_cache(pkl_path)
     if X is not None:
@@ -218,7 +218,7 @@ def extract(enrollment, base_date):
     check_dataframe = Util.dataframe_checker(logger)
 
     check_dataframe(EUC_last_week, 'EUC_last_week')
-    X = pd.merge(enrollment, EUC_last_week, how='left', on='enrollment_id')
+    X = pd.merge(enroll_all, EUC_last_week, how='left', on='enrollment_id')
 
     check_dataframe(EUC_2nd_last_week, 'EUC_2nd_last_week')
     X = pd.merge(X, EUC_2nd_last_week, how='left', on='enrollment_id')
@@ -259,15 +259,11 @@ def extract(enrollment, base_date):
     check_dataframe(S, 'S')
     X = pd.merge(X, S, how='left', on='enrollment_id')
 
-    del X['enrollment_id']
     del X['username']
     del X['course_id']
 
     X.fillna(0, inplace=True)
-
     check_dataframe(X, 'X')
-    X = X.as_matrix()
-
     IO.cache(X, pkl_path)
 
     return X

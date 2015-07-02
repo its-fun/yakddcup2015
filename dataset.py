@@ -40,20 +40,23 @@ def load_test():
     X = IO.fetch_cache(pkl_path)
 
     if X is None:
-        enroll_set = IO.load_enrollment_test()
         base_date = datetime(2014, 8, 1, 22, 0, 47)
-        X = None
+        X = IO.load_enrollment_test()
         for f in features.METHODS:
-            X_ = f.extract(enroll_set, base_date)
+            X_ = f.extract(base_date)
             if X_ is None:
                 print('%s returns None' % repr(f.__name__))
                 continue
-            if np.any(np.isnan(X_)):
+            if np.any(pd.isnull(X_)):
                 raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
-            if X is None:
-                X = X_
-            else:
-                X = np.c_[X, X_]
+
+            X = pd.merge(X, X_, how='left', on='enrollment_id')
+            if np.any(pd.isnull(X)):
+                raise RuntimeError('%s does not generate features of all '
+                                   'enrollments' % repr(f.__name__))
+
+        del X['enrollment_id']
+        X = X.as_matrix()
 
         IO.cache(X, pkl_path)
 
@@ -67,27 +70,28 @@ def __enroll_ids_with_log__(enroll_ids, base_date):
 
 def __load_dataset__(enroll_ids, base_date):
     """get all instances in this time window"""
-    enroll_set = IO.load_enrollments().set_index('enrollment_id')\
+    X = IO.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
-    X = None
     for f in features.METHODS:
-        X_ = f.extract(enroll_set, base_date)
+        X_ = f.extract(base_date)
         if X_ is None:
             print('%s returns None' % repr(f.__name__))
             continue
-        if np.any(np.isnan(X_)):
+        if np.any(pd.isnull(X_)):
             raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
-        if X is None:
-            X = X_
-        else:
-            X = np.c_[X, X_]
+
+        X = pd.merge(X, X_, how='left', on='enrollment_id')
+        if np.any(pd.isnull(X)):
+            raise RuntimeError('%s does not generate features of all '
+                               'enrollments' % repr(f.__name__))
 
     active_eids = set(log[(log['time'] > base_date) &
                           (log['time'] <= base_date + timedelta(days=10))]
                          ['enrollment_id'])
     y = [int(eid not in active_eids) for eid in enroll_ids]
 
-    return X, np.array(y, dtype=np.int)
+    del X['enrollment_id']
+    return X.as_matrix(), np.array(y, dtype=np.int)
 
 
 def load_train(depth=0):

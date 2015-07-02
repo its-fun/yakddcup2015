@@ -33,7 +33,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
 logger = logging.getLogger(os.path.basename(__file__))
 
 
-def extract(enrollment, base_date):
+def extract(base_date):
     pkl_path = Path.of_cache('dropouts.%s.pkl' % base_date)
     X = IO.fetch_cache(pkl_path)
     if X is not None:
@@ -142,7 +142,7 @@ def extract(enrollment, base_date):
     check_dataframe = Util.dataframe_checker(logger)
 
     check_dataframe(D_last, 'D_last')
-    X = pd.merge(enrollment, D_last, how='left', on='course_id')
+    X = pd.merge(enroll_all, D_last, how='left', on='course_id')
 
     check_dataframe(X1, 'X1')
     X = pd.merge(X, X1, how='left', on='enrollment_id')
@@ -153,15 +153,11 @@ def extract(enrollment, base_date):
     check_dataframe(X3, 'X3')
     X = pd.merge(X, X3, how='left', on='username')
 
-    del X['enrollment_id']
     del X['username']
     del X['course_id']
 
     X.fillna(0, inplace=True)
-
     check_dataframe(X, 'X')
-    X = X.as_matrix()
-
     IO.cache(X, pkl_path)
 
     return X

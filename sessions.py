@@ -57,7 +57,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
 logger = logging.getLogger(os.path.basename(__file__))
 
 
-def extract(enrollment, base_date):
+def extract(base_date):
     logger.debug('prepare datasets ...')
 
     enroll_all = IO.load_enrollments()

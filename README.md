@@ -8,8 +8,6 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 0. 处理NAs
 
-0. 单步检查dropouts.py
-
 1. 特征选择与normalize
 
 2. 手工加入规则，比如关于课程最近更新时间、用户最近操作时间
