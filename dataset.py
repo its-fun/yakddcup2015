@@ -56,6 +56,8 @@ def load_test():
                                    'enrollments' % repr(f.__name__))
 
         del X['enrollment_id']
+        del X['username']
+        del X['course_id']
         X = X.as_matrix()
 
         IO.cache(X, pkl_path)
@@ -91,6 +93,8 @@ def __load_dataset__(enroll_ids, base_date):
     y = [int(eid not in active_eids) for eid in enroll_ids]
 
     del X['enrollment_id']
+    del X['username']
+    del X['course_id']
     return X.as_matrix(), np.array(y, dtype=np.int)
 
 
