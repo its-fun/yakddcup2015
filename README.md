@@ -14,7 +14,7 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 4. 尝试深度学习model
 
-5. AdaBoost, RF, Bagging, Blending
+5. AdaBoost, GBDT, RF, Bagging, Blending
 
 
 ## Features (262)
