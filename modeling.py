@@ -50,7 +50,7 @@ def lr_with_fs():
         pl.xlabel("Number of features selected")
         pl.ylabel("Cross validation score (AUC)")
         pl.plot(range(1, len(rfe.grid_scores_) + 1), rfe.grid_scores_)
-        pl.show()
+        pl.savefig('lr_with_fs.refcv')
 
     X_pruned = rfe.transform(X_scaled)
 
