@@ -100,7 +100,7 @@ def lr_with_fs1():
     """
     Submission: lr_with_fs1_0703_03.csv
     E_val:
-    E_in:
+    E_in: 0.876954
     E_out:
     """
     from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
@@ -136,6 +136,54 @@ def lr_with_fs1():
                                  ('fs', lr),
                                  ('scale_new', new_scaler),
                                  ('lr', clf)]), 'lr_with_fs1_0703_03')
+
+
+def svc():
+    """
+    Submission: svc_0703_04.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.svm import SVC
+    from sklearn.cross_validation import StratifiedKFold
+    from sklearn.grid_search import RandomizedSearchCV
+    from sklearn.calibration import CalibratedClassifierCV
+    from scipy.stats import expon
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    svc = SVC(kernel='linear', class_weight='auto')
+    rs = RandomizedSearchCV(svc, n_iter=50, scoring='roc_auc', n_jobs=-1,
+                            cv=StratifiedKFold(y, 5),
+                            param_distributions={'C': expon()})
+    rs.fit(X_scaled, y)
+
+    logger.debug('Got best SVC.')
+    logger.debug('Grid scores: %s', rs.grid_scores_)
+    logger.debug('Best score (E_val): %s', rs.best_score_)
+    logger.debug('Best params: %s', rs.best_params_)
+    IO.cache(rs, Path.of_cache('svc.RandomizedSearchCV.SVC.pkl'))
+
+    svc = rs.best_estimator_
+    IO.cache(rs, Path.of_cache('svc.SVC.pkl'))
+
+    isotonic = CalibratedClassifierCV(svc, cv=StratifiedKFold(y, 5),
+                                      method='isotonic')
+    isotonic.fit(X_scaled, y)
+    IO.cache(rs, Path.of_cache('svc.CalibratedClassifierCV.isotonic.pkl'))
+
+    logger.debug('Got best isotonic CalibratedClassifier.')
+    logger.debug('E_in (isotonic): %f', Util.auc_score(isotonic, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('svc', isotonic)]), 'svc_0703_04')
 
 
 if __name__ == '__main__':
