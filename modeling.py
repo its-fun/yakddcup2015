@@ -19,8 +19,8 @@ def lr_with_scale():
     """
     Submission: lr_with_scale_0703_01.csv
     E_val: <missing>
-    E_in: 0.857351105162
-    E_out: 0.854097855439904
+    E_in: 0.878883
+    E_out: 0.8766589627938616
     """
     from sklearn.linear_model import LogisticRegressionCV
     from sklearn.preprocessing import StandardScaler
@@ -94,6 +94,48 @@ def lr_with_fs():
                                  ('rfe', rfe),
                                  ('scale_new', new_scaler),
                                  ('lr', clf)]), 'lr_with_fs_0703_01')
+
+
+def lr_with_fs1():
+    """
+    Submission: lr_with_fs1_0703_03.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    pkl_path = Path.of_cache('lr_with_fs1.LR.FS.pkl')
+    lr = IO.fetch_cache(pkl_path)
+    if lr is None:
+        lr = LogisticRegression(class_weight='auto')
+        lr.fit(X_scaled, y)
+        IO.cache(lr, pkl_path)
+
+    X_pruned = lr.transform(X_scaled)
+
+    new_scaler = StandardScaler()
+    new_scaler.fit(X_pruned)
+    X_new = new_scaler.transform(X_pruned)
+
+    clf = LogisticRegressionCV(cv=10, scoring='roc_auc', n_jobs=-1)
+    clf.fit(X_new, y)
+
+    print('CV scores: %s' % clf.scores_)
+    print('Ein: %f' % Util.auc_score(clf, X_new, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('fs', lr),
+                                 ('scale_new', new_scaler),
+                                 ('lr', clf)]), 'lr_with_fs1_0703_03')
 
 
 if __name__ == '__main__':
