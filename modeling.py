@@ -35,7 +35,6 @@ def lr_with_scale():
     clf = LogisticRegressionCV(cv=10, scoring='roc_auc', n_jobs=-1)
     clf.fit(X_scaled, y)
     print('CV scores: %s' % clf.scores_)
-    print('Eval: %f' % sum(clf.scores_) / len(clf.scores_))
     print('Ein: %f' % Util.auc_score(clf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
