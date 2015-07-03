@@ -16,3 +16,8 @@ def dataframe_checker(logger):
                 if np.any(pd.isnull(df[c])):
                     logger.debug('%s: column `%s` has Na', msg, c)
     return check
+
+
+def auc_score(clf, X, y):
+    from sklearn.metrics import roc_auc_score
+    return roc_auc_score(y, clf.predict_proba(X)[:, 1])
