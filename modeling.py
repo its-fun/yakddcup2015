@@ -15,6 +15,33 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
 logger = logging.getLogger('modeling')
 
 
+def lr_with_scale():
+    """
+    Submission: lr_with_scale_0703_01.csv
+    E_val: <missing>
+    E_in: 0.857351105162
+    E_out: 0.854097855439904
+    """
+    from sklearn.linear_model import LogisticRegressionCV
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    clf = LogisticRegressionCV(cv=10, scoring='roc_auc', n_jobs=-1)
+    clf.fit(X_scaled, y)
+    print('CV scores: %s' % clf.scores_)
+    print('Eval: %f' % sum(clf.scores_) / len(clf.scores_))
+    print('Ein: %f' % Util.auc_score(clf, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('lr', clf)]), 'lr_with_scale_0703_01')
+
+
 def lr_with_fs():
     """
     Submission: lr_with_fs_0703_01.csv
