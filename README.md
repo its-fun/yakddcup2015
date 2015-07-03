@@ -14,7 +14,9 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 4. 尝试深度学习model
 
-5. AdaBoost, GBDT, RF, Bagging, Blending
+5. LR, SVC(linear/poly/rbf), GBDT
+
+6. http://scikit-learn.org/stable/modules/ensemble.html: RF, AdaBoost(with LR/DT/SVC)
 
 
 ## Features (262)
