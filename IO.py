@@ -115,3 +115,18 @@ def load_object():
 
 def load_train_y():
     return pd.read_csv(Path.TRAIN_Y, header=None, names=['enrollment_id', 'y'])
+
+
+def dump_submission(clf, filename):
+    path = filename
+    if not path.startswith('data/submission/'):
+        path = 'data/submission/' + path
+    if not path.endswith('.csv'):
+        path += '.not-submitted.csv'
+    enroll_test = load_enrollment_test()['enrollment_id']
+    import dataset
+    X_test = dataset.load_test()
+    y_test = clf.predict_proba(X_test)[:, 1]
+    lines = ['%d,%f\n' % l for l in zip(enroll_test, y_test)]
+    with open(path, 'w') as f:
+        f.writelines(lines)
