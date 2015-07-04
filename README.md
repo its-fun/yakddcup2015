@@ -10,7 +10,7 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 2. 观察预测错了的instance
 
-3. 尝试深度学习model
+3. 尝试深度学习model，http://card.memect.com/?q=keras
 
 4. LR, SVC(linear/poly/rbf)
 
