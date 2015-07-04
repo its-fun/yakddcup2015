@@ -284,6 +284,62 @@ def knn():
                                  ('knn', grid)]), 'knn_0704_01')
 
 
+def lr_with_scale2():
+    """
+    Submission: lr_with_scale2_0704_03.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.linear_model import LogisticRegressionCV
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    clf = LogisticRegressionCV(cv=10, scoring='roc_auc', n_jobs=-1,
+                               class_weight='auto')
+    clf.fit(X_scaled, y)
+    print('CV scores: %s' % clf.scores_)
+    print('Ein: %f' % Util.auc_score(clf, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('lr', clf)]), 'lr_with_scale2_0704_03')
+
+
+def rf():
+    """
+    Submission: rf_0704_02.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.ensemble import RandomForestClassifier
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    rf = RandomForestClassifier(n_estimators=300, oob_score=True, n_jobs=-1,
+                                class_weight='auto')
+    rf.fit(X_scaled, y)
+
+    logger.debug('Eval(oob): %f', rf.oob_score_)
+    logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
+
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.300.pkl'))
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('rf', rf)]), 'rf_0704_02')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
