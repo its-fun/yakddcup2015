@@ -46,6 +46,7 @@ import logging
 import sys
 import os
 from datetime import timedelta
+import multiprocessing as par
 
 import numpy as np
 import pandas as pd
@@ -58,6 +59,11 @@ import Util
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
 logger = logging.getLogger(os.path.basename(__file__))
+
+
+def __get_features__(param):
+    log_all, dt = param
+    return dt, sessions_of(log_all, dt)
 
 
 def extract(base_date):
@@ -77,82 +83,21 @@ def extract(base_date):
 
     logger.debug('datasets prepared')
 
-    # 0: number of 3-hour defined sessions in the enrollment
-
-    # 1~4: average, standard deviation, maximal, minimal numbers of events in
-    # 3-hour defined sessions in the enrollment
-
-    # 5~8: statistics of 3-hour defined sessions: mean, std, max, min of
-    # duration
-
-    X3H = sessions_of(log_all, timedelta(hours=3))
-
-    logger.debug('0~8')
-
-    # 9: number of 1-hour defined sessions in the enrollment
-
-    # 10~13: average, standard deviation, maximal, minimal numbers of events in
-    # 1-hour defined sessions in the enrollment
-
-    # 14~17: statistics of 1-hour defined sessions: mean, std, max, min of
-    # duration
-
-    X1H = sessions_of(log_all, timedelta(hours=1))
-
-    logger.debug('9~17')
-
-    # 18: number of 12-hour defined sessions in the enrollment
-
-    # 19~22: average, standard deviation, maximal, minimal numbers of events in
-    # 12-hour defined sessions in the enrollment
-
-    # 23~26: statistics of 12-hour defined sessions: mean, std, max, min of
-    # duration
-
-    X12H = sessions_of(log_all, timedelta(hours=12))
-
-    logger.debug('18~26')
-
-    # 27: number of 1-day defined sessions in the enrollment
-
-    # 28~31: average, standard deviation, maximal, minimal numbers of events in
-    # 1-day defined sessions in the enrollment
-
-    # 32~35: statistics of 1-day defined sessions: mean, std, max, min of
-    # duration
-
-    X1D = sessions_of(log_all, timedelta(days=1))
-
-    logger.debug('27~35')
-
-    # 36: number of 7-day defined sessions in the enrollment
-
-    # 37~40: average, standard deviation, maximal, minimal numbers of events in
-    # 7-day defined sessions in the enrollment
-
-    # 41~44: statistics of 7-day defined sessions: mean, std, max, min of
-    # duration
-
-    X7D = sessions_of(log_all, timedelta(days=7))
-
-    logger.debug('36~44')
-
     check_dataframe = Util.dataframe_checker(logger)
 
-    check_dataframe(X3H, 'X3H')
-    X = pd.merge(enroll_all, X3H, how='left', on='enrollment_id')
+    n_proc = par.cpu_count()
+    params = [(log_all, dt)
+              for dt in [timedelta(hours=3), timedelta(hours=1),
+                         timedelta(hours=12), timedelta(days=1),
+                         timedelta(days=7)]]
+    pool = par.Pool(processes=min(n_proc, len(params)))
+    X = enroll_all
+    for dt, X_ in pool.map(__get_features__, params):
+        check_dataframe(X_, str(dt))
+        X = pd.merge(X, X_, how='left', on='enrollment_id')
 
-    check_dataframe(X1H, 'X1H')
-    X = pd.merge(X, X1H, how='left', on='enrollment_id')
-
-    check_dataframe(X12H, 'X12H')
-    X = pd.merge(X, X12H, how='left', on='enrollment_id')
-
-    check_dataframe(X1D, 'X1D')
-    X = pd.merge(X, X1D, how='left', on='enrollment_id')
-
-    check_dataframe(X7D, 'X7D')
-    X = pd.merge(X, X7D, how='left', on='enrollment_id')
+    pool.close()
+    pool.join()
 
     del X['username']
     del X['course_id']

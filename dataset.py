@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 import logging
 import sys
 import os
+import multiprocessing as par
 
 import numpy as np
 import pandas as pd
@@ -70,22 +71,31 @@ def __enroll_ids_with_log__(enroll_ids, base_date):
     return np.array([eid for eid in enroll_ids if eid in log_eids])
 
 
+def __get_features__(param):
+    f, base_date = param
+    X_ = f.extract(base_date)
+    if X_ is None:
+        print('%s returns None' % repr(f.__name__))
+        continue
+    if np.any(pd.isnull(X_)):
+        raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
+    return f, X_
+
+
 def __load_dataset__(enroll_ids, base_date):
     """get all instances in this time window"""
     X = IO.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
-    for f in features.METHODS:
-        X_ = f.extract(base_date)
-        if X_ is None:
-            print('%s returns None' % repr(f.__name__))
-            continue
-        if np.any(pd.isnull(X_)):
-            raise RuntimeError('%s can generate NA(s)' % repr(f.__name__))
-
+    n_proc = par.cpu_count()
+    params = [(f, base_date) for f in features.METHODS]
+    pool = par.Pool(processes=min(n_proc, len(params)))
+    for f, X_ in pool.map(__get_features__, params):
         X = pd.merge(X, X_, how='left', on='enrollment_id')
         if np.any(pd.isnull(X)):
             raise RuntimeError('%s does not generate features of all '
                                'enrollments' % repr(f.__name__))
+    pool.close()
+    pool.join()
 
     active_eids = set(log[(log['time'] > base_date) &
                           (log['time'] <= base_date + timedelta(days=10))]
