@@ -288,7 +288,7 @@ def lr_with_scale2():
     """
     Submission: lr_with_scale2_0704_03.csv
     E_val:
-    E_in:
+    E_in: 0.879160
     E_out:
     """
     from sklearn.linear_model import LogisticRegressionCV
