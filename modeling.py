@@ -351,8 +351,8 @@ def rf2():
     """
     Submission: rf2_0704_04.csv
     3000 trees
-    E_val:
-    E_in:
+    E_val: 0.871431
+    E_in: 0.999998
     E_out:
     30000 trees
     E_val:
