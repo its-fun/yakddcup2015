@@ -63,7 +63,10 @@ logger = logging.getLogger(os.path.basename(__file__))
 
 def __get_features__(param):
     log_all, dt = param
-    return dt, sessions_of(log_all, dt)
+    logger.debug('getting features of timedelta(%s)', dt)
+    X = sessions_of(log_all, dt)
+    logger.debug('got features of timedelta(%s)', dt)
+    return dt, X
 
 
 def extract(base_date):
