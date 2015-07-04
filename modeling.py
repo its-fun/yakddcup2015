@@ -244,6 +244,46 @@ def svc():
                                  ('svc', isotonic)]), 'svc_0703_04')
 
 
+def knn():
+    """
+    Submission: knn_0704_01.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.cross_validation import StratifiedKFold
+    from sklearn.grid_search import GridSearchCV
+    from sklearn.neighbors import KNeighborsClassifier
+    import numpy as np
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    knn = KNeighborsClassifier()
+    params = {
+        'n_neighbors': np.arange(5, 51, 5),
+        'weights': ['uniform', 'distance'],
+        'leaf_size': np.arange(30, 201, 10)
+    }
+    grid = GridSearchCV(knn, params, scoring='roc_auc', n_jobs=-1,
+                        cv=StratifiedKFold(y, 5))
+    grid.fit(X_scaled, y)
+
+    logger.debug('Got best kNN.')
+    logger.debug('Grid scores: %s', grid.grid_scores_)
+    logger.debug('Best score (E_val): %s', grid.best_score_)
+    logger.debug('Best params: %s', grid.best_params_)
+    IO.cache(grid, Path.of_cache('knn.GridSearchCV.KNeighborsClassifier.pkl'))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('knn', grid)]), 'knn_0704_01')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
