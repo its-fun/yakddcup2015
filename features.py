@@ -26,9 +26,9 @@ The extra first column should be enrollment_id
 
 
 import events
-import sessions
 import time_related
 import dropouts
+import sessions
 
 
-METHODS = [events, sessions, time_related, dropouts]
+METHODS = [events, time_related, dropouts, sessions]
