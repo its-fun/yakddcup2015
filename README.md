@@ -6,17 +6,17 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 ## TODO
 
-1. 特征选择与normalize
+1. 手工加入规则，比如关于课程最近更新时间、用户最近操作时间
 
-2. 手工加入规则，比如关于课程最近更新时间、用户最近操作时间
+2. 观察预测错了的instance
 
-3. 观察预测错了的instance
+3. 尝试深度学习model
 
-4. 尝试深度学习model
+4. LR, SVC(linear/poly/rbf)
 
-5. LR, SVC(linear/poly/rbf), GBDT
+5. Nearest Neighbors, Naive Bayes
 
-6. http://scikit-learn.org/stable/modules/ensemble.html: RF, AdaBoost(with LR/DT/SVC)
+6. http://scikit-learn.org/stable/modules/ensemble.html: GBDT, RF, AdaBoost(with LR/DT/SVC)
 
 
 ## Features (262)
