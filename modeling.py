@@ -5,6 +5,8 @@
 import logging
 import sys
 
+import numpy as np
+
 import dataset
 import IO
 import Path
@@ -301,11 +303,12 @@ def lr_with_scale2():
     raw_scaler.fit(X)
     X_scaled = raw_scaler.transform(X)
 
-    clf = LogisticRegressionCV(cv=10, scoring='roc_auc', n_jobs=-1,
+    clf = LogisticRegressionCV(Cs=50, cv=5, scoring='roc_auc', n_jobs=-1,
                                class_weight='auto')
     clf.fit(X_scaled, y)
-    print('CV scores: %s' % clf.scores_)
-    print('Ein: %f' % Util.auc_score(clf, X_scaled, y))
+    logger.debug('Best C: %f', clf.C_[0])
+    logger.debug('Eval: %f', np.average(clf.scores_[1][clf.Cs_ == clf.C_]))
+    logger.debug('Ein: %f', Util.auc_score(clf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
                                  ('lr', clf)]), 'lr_with_scale2_0704_03')
