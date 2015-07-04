@@ -321,6 +321,9 @@ def rf():
     E_in: 0.999998
     E_out: 0.882316801296279
     30000 trees
+    E_val:
+    E_in:
+    E_out:
     """
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
@@ -339,9 +342,43 @@ def rf():
     logger.debug('Eval(oob): %f', rf.oob_score_)
     logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
 
-    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.300.pkl'))
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.auto.pkl'))
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
                                  ('rf', rf)]), 'rf_0704_02')
+
+
+def rf2():
+    """
+    Submission: rf2_0704_04.csv
+    3000 trees
+    E_val:
+    E_in:
+    E_out:
+    30000 trees
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.ensemble import RandomForestClassifier
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    rf = RandomForestClassifier(n_estimators=3000, oob_score=True, n_jobs=-1,
+                                class_weight='auto', max_features='log2')
+    rf.fit(X_scaled, y)
+
+    logger.debug('Eval(oob): %f', rf.oob_score_)
+    logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
+
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.log2.pkl'))
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('rf', rf)]), 'rf2_0704_04')
 
 
 if __name__ == '__main__':
