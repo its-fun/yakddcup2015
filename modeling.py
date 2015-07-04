@@ -291,4 +291,6 @@ if __name__ == '__main__':
         for fn in sys.argv[1:]:
             if fn not in variables or not isfunction(variables[fn]):
                 print('function %s not found' % repr(fn))
-            variables[fn]()
+                sys.exit(-1)
+            else:
+                variables[fn]()
