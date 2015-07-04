@@ -330,7 +330,7 @@ def rf():
     raw_scaler.fit(X)
     X_scaled = raw_scaler.transform(X)
 
-    rf = RandomForestClassifier(n_estimators=3000, oob_score=True, n_jobs=-1,
+    rf = RandomForestClassifier(n_estimators=30000, oob_score=True, n_jobs=-1,
                                 class_weight='auto')
     rf.fit(X_scaled, y)
 
