@@ -73,8 +73,8 @@ def __enroll_ids_with_log__(enroll_ids, base_date):
 
 def __get_features__(param):
     f, base_date = param
-    X_ = f.extract(base_date)
-    return f, X_
+    X_ = f(base_date)
+    return X_
 
 
 def __load_dataset__(enroll_ids, base_date):
@@ -82,9 +82,9 @@ def __load_dataset__(enroll_ids, base_date):
     X = IO.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
     n_proc = par.cpu_count()
-    params = [(f, base_date) for f in features.METHODS]
+    params = [(f.extract, base_date) for f in features.METHODS]
     pool = par.Pool(processes=min(n_proc, len(params)))
-    for f, X_ in pool.map(__get_features__, params):
+    for f, X_ in zip(features.METHODS, pool.map(__get_features__, params)):
         if X_ is None:
             print('%s returns None' % repr(f.__name__))
             continue
