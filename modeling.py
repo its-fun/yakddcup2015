@@ -316,9 +316,11 @@ def lr_with_scale2():
 def rf():
     """
     Submission: rf_0704_02.csv
-    E_val:
-    E_in:
-    E_out:
+    3000 trees
+    E_val: 0.871837
+    E_in: 0.999998
+    E_out: 0.882316801296279
+    30000 trees
     """
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
