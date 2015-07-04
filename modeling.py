@@ -307,7 +307,8 @@ def lr_with_scale2():
                                class_weight='auto')
     clf.fit(X_scaled, y)
     logger.debug('Best C: %f', clf.C_[0])
-    logger.debug('Eval: %f', np.average(clf.scores_[1][clf.Cs_ == clf.C_]))
+    logger.debug('Cs: %s', clf.Cs_)
+    logger.debug('Grid scores: %f', clf.scores_)
     logger.debug('Ein: %f', Util.auc_score(clf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
