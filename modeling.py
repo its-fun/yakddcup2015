@@ -167,6 +167,35 @@ def svc_test():
     logger.debug('E_in (isotonic): %f', Util.auc_score(isotonic, X_scaled, y))
 
 
+def svc_test2():
+    """
+    Submission:
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.svm import SVC
+    from sklearn.cross_validation import StratifiedKFold
+    from sklearn.calibration import CalibratedClassifierCV
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    svc = SVC(kernel='linear', class_weight='auto', cache_size=10240)
+    svc.fit(X_scaled, y)
+
+    isotonic = CalibratedClassifierCV(svc, cv=StratifiedKFold(y, 5),
+                                      method='isotonic')
+    isotonic.fit(X_scaled, y)
+
+    logger.debug('Got best isotonic CalibratedClassifier.')
+    logger.debug('E_in (isotonic): %f', Util.auc_score(isotonic, X_scaled, y))
+
+
 def svc():
     """
     Submission: svc_0703_04.csv
