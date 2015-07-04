@@ -5,8 +5,6 @@
 import logging
 import sys
 
-import numpy as np
-
 import dataset
 import IO
 import Path
@@ -290,8 +288,8 @@ def lr_with_scale2():
     """
     Submission: lr_with_scale2_0704_03.csv
     E_val:
-    E_in: 0.879160
-    E_out:
+    E_in: 0.878996
+    E_out: 0.8768131004917349
     """
     from sklearn.linear_model import LogisticRegressionCV
     from sklearn.preprocessing import StandardScaler
