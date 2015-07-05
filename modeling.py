@@ -321,9 +321,9 @@ def rf():
     E_in: 0.999998
     E_out: 0.882316801296279
     15000 trees
-    E_val:
-    E_in:
-    E_out:
+    E_val: 0.872011
+    E_in: 0.999998
+    E_out: 0.8824869811781106
     """
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
