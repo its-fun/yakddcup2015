@@ -23,6 +23,7 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
                     format='%(asctime)s %(name)s %(levelname)s\t%(message)s')
 
 
+logger = logging.getLogger('dataset')
 log = IO.load_logs()
 
 
@@ -36,6 +37,8 @@ def load_test():
     X: numpy ndarray, shape: (num_of_enrollments, num_of_features)
     Rows of features.
     """
+    logger.debug('loading test set')
+
     pkl_path = Path.of_cache('test_X.pkl')
     X = IO.fetch_cache(pkl_path)
 
@@ -62,6 +65,7 @@ def load_test():
 
         IO.cache(X, pkl_path)
 
+    logger.debug('test set loaded')
     return X
 
 
@@ -120,7 +124,7 @@ def load_train(depth=0):
     y: numpy ndarray, shape: (num_of_enrollments,)
     Vector of labels. It is the labels of all time if cache_only is True.
     """
-    logger = logging.getLogger('load_train')
+    logger.debug('loading train set of depth %d', depth)
 
     enroll_set = IO.load_enrollment_train()
     base_date = datetime(2014, 8, 1, 22, 0, 47)
@@ -183,6 +187,7 @@ def load_train(depth=0):
         base_date -= Dw
         enroll_ids = __enroll_ids_with_log__(enroll_ids, base_date)
 
+    logger.debug('train set loaded')
     return X, y
 
 
