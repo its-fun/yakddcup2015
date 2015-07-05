@@ -483,24 +483,28 @@ def gbdt():
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
-    from sklearn.pipeline import Pipeline
     from sklearn.cross_validation import KFold, train_test_split
     import pylab as pl
     import numpy as np
 
     X, y = dataset.load_train()
+    raw_scaler = StandardScaler()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    raw_scaler.fit(X_train)
+    X_train = raw_scaler.transform(X_train)
+    X_test = raw_scaler.transform(X_test)
 
     n_estimators = 1000
     params = {'n_estimators': n_estimators, 'loss': 'deviance',
               'learning_rate': 0.1, 'subsample': 0.5}
     gb = GradientBoostingClassifier(**params)
 
-    clf = Pipeline([('scaler', StandardScaler()), ('GBDT', gb)])
-    clf.fit(X_train, y_train)
+    gb.fit(X_train, y_train)
 
-    logger.debug('Eval: %f', Util.auc_score(clf, X_test, y_test))
-    logger.debug('Ein: %f', Util.auc_score(clf, X_train, y_train))
+    IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
+
+    logger.debug('Eval: %f', Util.auc_score(gb, X_test, y_test))
+    logger.debug('Ein: %f', Util.auc_score(gb, X_train, y_train))
 
     x = np.arange(n_estimators) + 1
 
@@ -522,8 +526,8 @@ def gbdt():
         return val_scores
 
     cv_score = cv_estimate(3)
-    test_score = heldout_score(clf, X_test, y_test)
-    cumsum = -np.cumsum(clf.oob_improvement_)
+    test_score = heldout_score(gb, X_test, y_test)
+    cumsum = -np.cumsum(gb.oob_improvement_)
     oob_best_iter = x[np.argmin(cumsum)]
     test_score -= test_score[0]
     test_best_iter = x[np.argmin(test_score)]
