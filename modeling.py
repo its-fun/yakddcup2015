@@ -422,10 +422,51 @@ def erf():
     logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
-                                 ('rf', rf)]), 'erf_0705_01')
+                                 ('erf', rf)]), 'erf_0705_01')
 
     logger.debug('caching fitted ExtraTreesClassifier')
-    IO.cache(rf, Path.of_cache('rf.ExtraTreesClassifier.auto.pkl'))
+    IO.cache(rf, Path.of_cache('erf.ExtraTreesClassifier.auto.pkl'))
+    logger.debug('cached fitted ExtraTreesClassifier')
+
+
+def erf2():
+    """
+    Submission: erf2_0705_02.csv
+    3000 trees
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.ensemble import ExtraTreesClassifier
+    from sklearn.cross_validation import cross_val_score
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    del X
+    import gc
+    gc.collect()
+
+    erf = ExtraTreesClassifier(n_estimators=3000, n_jobs=-1,
+                               class_weight='auto')
+    scores = cross_val_score(erf, X_scaled, y, cv=5, n_jobs=-1)
+    logger.debug('CV: %s', scores)
+    logger.debug('Eval: %f', sum(scores) / len(scores))
+
+    erf.fit(X_scaled, y)
+    logger.debug('ExtraTreesClassifier fitted')
+    logger.debug('Ein: %f', Util.auc_score(erf, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('erf', erf)]), 'erf2_0705_02')
+
+    logger.debug('caching fitted ExtraTreesClassifier')
+    IO.cache(erf, Path.of_cache('erf2.ExtraTreesClassifier.auto.pkl'))
     logger.debug('cached fitted ExtraTreesClassifier')
 
 
