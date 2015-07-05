@@ -474,6 +474,90 @@ def erf2():
     logger.debug('cached fitted ExtraTreesClassifier')
 
 
+def gbdt():
+    """
+    Submission:
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.cross_validation import KFold, train_test_split
+    import pylab as pl
+    import numpy as np
+
+    X, y = dataset.load_train()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+    n_estimators = 1000
+    params = {'n_estimators': n_estimators, 'loss': 'deviance',
+              'learning_rate': 0.1, 'subsample': 0.5}
+    gb = GradientBoostingClassifier(**params)
+
+    clf = Pipeline([('scaler', StandardScaler()), ('GBDT', gb)])
+    clf.fit(X_train, y_train)
+
+    logger.debug('Eval: %f', Util.auc_score(clf, X_test, y_test))
+    logger.debug('Ein: %f', Util.auc_score(clf, X_train, y_train))
+
+    x = np.arange(n_estimators) + 1
+
+    def heldout_score(clf, X_test, y_test):
+        """compute deviance scores on ``X_test`` and ``y_test``. """
+        score = np.zeros((n_estimators,), dtype=np.float64)
+        for i, y_pred in enumerate(clf.staged_decision_function(X_test)):
+            score[i] = clf.loss_(y_test, y_pred)
+        return score
+
+    def cv_estimate(n_folds=3):
+        cv = KFold(n=X_train.shape[0], n_folds=n_folds)
+        cv_clf = GradientBoostingClassifier(**params)
+        val_scores = np.zeros((n_estimators,), dtype=np.float64)
+        for train, test in cv:
+            cv_clf.fit(X_train[train], y_train[train])
+            val_scores += heldout_score(cv_clf, X_train[test], y_train[test])
+        val_scores /= n_folds
+        return val_scores
+
+    cv_score = cv_estimate(3)
+    test_score = heldout_score(clf, X_test, y_test)
+    cumsum = -np.cumsum(clf.oob_improvement_)
+    oob_best_iter = x[np.argmin(cumsum)]
+    test_score -= test_score[0]
+    test_best_iter = x[np.argmin(test_score)]
+    cv_score -= cv_score[0]
+    cv_best_iter = x[np.argmin(cv_score)]
+
+    oob_color = list(map(lambda x: x / 256.0, (190, 174, 212)))
+    test_color = list(map(lambda x: x / 256.0, (127, 201, 127)))
+    cv_color = list(map(lambda x: x / 256.0, (253, 192, 134)))
+
+    pl.plot(x, cumsum, label='OOB loss', color=oob_color)
+    pl.plot(x, test_score, label='Test loss', color=test_color)
+    pl.plot(x, cv_score, label='CV loss', color=cv_color)
+    pl.axvline(x=oob_best_iter, color=oob_color)
+    pl.axvline(x=test_best_iter, color=test_color)
+    pl.axvline(x=cv_best_iter, color=cv_color)
+
+    xticks = pl.xticks()
+    xticks_pos = np.array(xticks[0].tolist() +
+                          [oob_best_iter, cv_best_iter, test_best_iter])
+    xticks_label = np.array(list(map(lambda t: int(t), xticks[0])) +
+                            ['OOB', 'CV', 'Test'])
+    ind = np.argsort(xticks_pos)
+    xticks_pos = xticks_pos[ind]
+    xticks_label = xticks_label[ind]
+    pl.xticks(xticks_pos, xticks_label)
+
+    pl.legend(loc='upper right')
+    pl.ylabel('normalized loss')
+    pl.xlabel('number of iterations')
+
+    pl.savefig('gbdt.oob')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
