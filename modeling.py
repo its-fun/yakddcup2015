@@ -437,8 +437,8 @@ def erf2():
     """
     Submission: erf2_0705_02.csv
     3000 trees
-    E_val:
-    E_in:
+    E_val: [0.83766072, 0.89704662, 0.85299486, 0.8639041, 0.82955865]
+    E_in: 1.000000
     E_out:
     """
     from sklearn.preprocessing import StandardScaler
