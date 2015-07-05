@@ -538,6 +538,10 @@ def gbdt():
     test_color = list(map(lambda x: x / 256.0, (127, 201, 127)))
     cv_color = list(map(lambda x: x / 256.0, (253, 192, 134)))
 
+    IO.cache(cumsum, Path.of_cache('gbdt.cumsum.pkl'))
+    IO.cache(test_score, Path.of_cache('gbdt.test_score.pkl'))
+    IO.cache(cv_score, Path.of_cache('gbdt.cv_score.pkl'))
+
     pl.plot(x, cumsum, label='OOB loss', color=oob_color)
     pl.plot(x, test_score, label='Test loss', color=test_color)
     pl.plot(x, cv_score, label='CV loss', color=cv_color)
