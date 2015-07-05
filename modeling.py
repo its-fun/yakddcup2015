@@ -390,6 +390,45 @@ def rf2():
                                  ('rf', rf)]), 'rf2_0704_04')
 
 
+def erf():
+    """
+    Submission: erf_0705_01.csv
+    15000 trees
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.ensemble import ExtraTreesClassifier
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+    del X
+
+    rf = ExtraTreesClassifier(n_estimators=15000, oob_score=True, n_jobs=-1,
+                              class_weight='auto')
+    rf.fit(X_scaled, y)
+
+    logger.debug('ExtraTreesClassifier fitted')
+
+    import gc
+    gc.collect()
+
+    logger.debug('Eval(oob): %f', rf.oob_score_)
+    logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('rf', rf)]), 'erf_0705_01')
+
+    logger.debug('caching fitted ExtraTreesClassifier')
+    IO.cache(rf, Path.of_cache('rf.ExtraTreesClassifier.auto.pkl'))
+    logger.debug('cached fitted ExtraTreesClassifier')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
