@@ -413,7 +413,7 @@ def erf():
     X_scaled = raw_scaler.transform(X)
     del X
 
-    rf = ExtraTreesClassifier(n_estimators=15000, oob_score=True, n_jobs=-1,
+    rf = ExtraTreesClassifier(n_estimators=3000, oob_score=True, n_jobs=-1,
                               class_weight='auto', bootstrap=True)
     rf.fit(X_scaled, y)
 
