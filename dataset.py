@@ -24,7 +24,6 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG,
 
 
 logger = logging.getLogger('dataset')
-log = IO.load_logs()
 
 
 def load_test():
@@ -69,12 +68,12 @@ def load_test():
     return X
 
 
-def __enroll_ids_with_log__(enroll_ids, base_date):
+def __enroll_ids_with_log__(log, enroll_ids, base_date):
     log_eids = set(log[log['time'] <= base_date]['enrollment_id'].unique())
     return np.array([eid for eid in enroll_ids if eid in log_eids])
 
 
-def __load_dataset__(enroll_ids, base_date):
+def __load_dataset__(log, enroll_ids, base_date):
     """get all instances in this time window"""
     X = IO.load_enrollments().set_index('enrollment_id')\
         .ix[enroll_ids].reset_index()
@@ -127,11 +126,12 @@ def load_train(depth=0):
     logger.debug('loading train set of depth %d', depth)
 
     enroll_set = IO.load_enrollment_train()
+    log_all = IO.load_logs()
     base_date = datetime(2014, 8, 1, 22, 0, 47)
 
     logger.debug('loading features before %s', base_date)
 
-    enroll_ids = __enroll_ids_with_log__(enroll_set['enrollment_id'],
+    enroll_ids = __enroll_ids_with_log__(log_all, enroll_set['enrollment_id'],
                                          base_date)
 
     pkl_X_path = Path.of_cache('train_X.%s.pkl' % base_date)
@@ -143,7 +143,7 @@ def load_train(depth=0):
     if X is None or y is None:
         logger.debug('cache missed, calculating ...')
 
-        X, _ = __load_dataset__(enroll_ids, base_date)
+        X, _ = __load_dataset__(log_all, enroll_ids, base_date)
         y_with_id = IO.load_train_y()
 
         y = np.array(pd.merge(enroll_set, y_with_id, how='left',
@@ -158,7 +158,7 @@ def load_train(depth=0):
     base_date = datetime(2014, 7, 22, 22, 0, 47)
     Dw = timedelta(days=7)
 
-    enroll_ids = __enroll_ids_with_log__(enroll_ids, base_date)
+    enroll_ids = __enroll_ids_with_log__(log_all, enroll_ids, base_date)
     for _ in range(depth):
         if enroll_ids.size <= 0:
             break
@@ -174,7 +174,7 @@ def load_train(depth=0):
         if X_temp is None or y_temp is None:
             logger.debug('cache missed, calculating ...')
 
-            X_temp, y_temp = __load_dataset__(enroll_ids, base_date)
+            X_temp, y_temp = __load_dataset__(log_all, enroll_ids, base_date)
 
             IO.cache(X_temp, pkl_X_path)
             IO.cache(y_temp, pkl_y_path)
@@ -185,7 +185,7 @@ def load_train(depth=0):
 
         # update base_date and enroll_ids
         base_date -= Dw
-        enroll_ids = __enroll_ids_with_log__(enroll_ids, base_date)
+        enroll_ids = __enroll_ids_with_log__(log_all, enroll_ids, base_date)
 
     logger.debug('train set loaded')
     return X, y
