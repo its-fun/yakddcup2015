@@ -320,7 +320,7 @@ def rf():
     E_val: 0.871837
     E_in: 0.999998
     E_out: 0.882316801296279
-    30000 trees
+    15000 trees
     E_val:
     E_in:
     E_out:
@@ -336,7 +336,7 @@ def rf():
     X_scaled = raw_scaler.transform(X)
     del X
 
-    rf = RandomForestClassifier(n_estimators=30000, oob_score=True, n_jobs=-1,
+    rf = RandomForestClassifier(n_estimators=15000, oob_score=True, n_jobs=-1,
                                 class_weight='auto')
     rf.fit(X_scaled, y)
 
@@ -345,15 +345,15 @@ def rf():
     import gc
     gc.collect()
 
-    logger.debug('caching fitted RandomForestClassifier')
-    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.auto.pkl'))
-    logger.debug('cached fitted RandomForestClassifier')
-
     logger.debug('Eval(oob): %f', rf.oob_score_)
     logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
                                  ('rf', rf)]), 'rf_0704_02')
+
+    logger.debug('caching fitted RandomForestClassifier')
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.auto.pkl'))
+    logger.debug('cached fitted RandomForestClassifier')
 
 
 def rf2():
