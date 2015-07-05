@@ -342,9 +342,9 @@ def rf():
     logger.debug('Eval(oob): %f', rf.oob_score_)
     logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
 
-    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.auto.pkl'))
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
                                  ('rf', rf)]), 'rf_0704_02')
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.auto.pkl'))
 
 
 def rf2():
