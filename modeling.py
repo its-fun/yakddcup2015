@@ -393,6 +393,10 @@ def rf2():
 def erf():
     """
     Submission: erf_0705_01.csv
+    3000 trees
+    E_val:
+    E_in:
+    E_out:
     15000 trees
     E_val:
     E_in:
