@@ -652,14 +652,13 @@ def gbdt_grid():
     X_scaled = raw_scaler.fit_transform(X)
 
     param_grid = {
-        'n_estimators': np.arange(400, 1501, 100),
         'learning_rate': [0.05, 0.1],
         'subsample': [0.3, 0.5, 0.7]
     }
 
-    grid = GridSearchCV(GradientBoostingClassifier(), param_grid,
-                        scoring='roc_auc', n_jobs=-1, cv=StratifiedKFold(y, 5),
-                        refit=False, verbose=1)
+    grid = GridSearchCV(GradientBoostingClassifier(n_estimators=3000),
+                        param_grid, scoring='roc_auc', n_jobs=-1,
+                        cv=StratifiedKFold(y, 5), refit=False, verbose=1)
     grid.fit(X_scaled, y)
 
     logger.debug('Got best GBDT.')
