@@ -571,6 +571,10 @@ def gbdt():
     E_val: 0.870976
     E_in: 0.899593
     E_out: 0.88711101837711
+    n_estimators: 3000, learning_rate: 0.1, subsample: 0.5
+    E_val:
+    E_in:
+    E_out:
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
@@ -580,7 +584,7 @@ def gbdt():
     X, y = dataset.load_train()
     clf = Pipeline([('scaler', StandardScaler()),
                     ('gbdt', GradientBoostingClassifier(
-                        n_estimators=500, learning_rate=0.1, subsample=0.5))])
+                        n_estimators=3000, learning_rate=0.1, subsample=0.5))])
 
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
@@ -655,21 +659,26 @@ def gbdt_grid():
 
     grid = GridSearchCV(GradientBoostingClassifier(), param_grid,
                         scoring='roc_auc', n_jobs=-1, cv=StratifiedKFold(y, 5),
-                        verbose=1)
+                        refit=False, verbose=1)
     grid.fit(X_scaled, y)
 
     logger.debug('Got best GBDT.')
     logger.debug('Grid scores: %s', grid.grid_scores_)
     logger.debug('Best score (E_val): %s', grid.best_score_)
     logger.debug('Best params: %s', grid.best_params_)
-    IO.cache(grid, Path.of_cache('gbdt_grid.GridSearchCV.pkl'))
-
-    logger.debug('E_in: %f', Util.auc_score(grid, X_scaled, y))
 
     X_test = dataset.load_test()
-    raw_scaler.fit(np.r_[X, X_test])
+    raw_scaler.fit_transform(np.r_[X, X_test])
+    X_scaled = raw_scaler.transform(X)
+
+    clf = GradientBoostingClassifier(**grid.best_params_)
+    clf.fit(X_scaled, y)
+
+    IO.cache(grid, Path.of_cache('gbdt_grid.GridSearchCV.pkl'))
+
+    logger.debug('E_in: %f', Util.auc_score(clf, X_scaled, y))
     IO.dump_submission(Pipeline([('scaler', raw_scaler),
-                                 ('gbdt', grid)]), 'gbdt_grid_0706_03')
+                                 ('gbdt', clf)]), 'gbdt_grid_0706_03')
 
 
 if __name__ == '__main__':
