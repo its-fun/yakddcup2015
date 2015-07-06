@@ -18,6 +18,8 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 6. http://scikit-learn.org/stable/modules/ensemble.html: GBDT, RF, AdaBoost(with LR/DT/SVC)
 
+7. 把测试集拿来一起做normalize
+
 
 ## Features (262)
 

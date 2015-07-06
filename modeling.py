@@ -563,7 +563,7 @@ def gbdt_oob():
 def gbdt():
     """
     Submission: gbdt_0706_01.csv
-    E_val:
+    E_val: 0.858235
     E_in:
     E_out:
     """
@@ -580,7 +580,6 @@ def gbdt():
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
 
-    logger.debug('Got best GBDT.')
     logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
 
     clf.fit(X, y)
