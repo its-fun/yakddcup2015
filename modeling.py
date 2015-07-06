@@ -589,6 +589,35 @@ def gbdt():
     IO.dump_submission(clf, 'gbdt_0706_01')
 
 
+def gbdt2():
+    """
+    Submission: gbdt2_0706_02.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.cross_validation import cross_val_score
+
+    X, y = dataset.load_train()
+    clf = Pipeline([('scaler', StandardScaler()),
+                    ('gbdt', GradientBoostingClassifier(
+                        loss='exponential', n_estimators=1000,
+                        learning_rate=0.1, subsample=0.5))])
+
+    scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
+                             verbose=1)
+    logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
+
+    clf.fit(X, y)
+    IO.cache(clf, Path.of_cache('gbdt2.Pipeline.pkl'))
+    logger.debug('E_in: %f', Util.auc_score(clf, X, y))
+
+    IO.dump_submission(clf, 'gbdt2_0706_02')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
