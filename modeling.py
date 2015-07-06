@@ -603,9 +603,9 @@ def gbdt2():
     Submission: gbdt2_0706_02.csv
     n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.852035
-    E_in:
-    E_out:
-    n_estimators: 500, learning_rate: 0.1, subsample: 0.5
+    E_in: 0.910251
+    E_out: 0.8874428893001793
+    n_estimators: 3000, learning_rate: 0.1, subsample: 0.5
     E_val:
     E_in:
     E_out:
@@ -618,7 +618,7 @@ def gbdt2():
     X, y = dataset.load_train()
     clf = Pipeline([('scaler', StandardScaler()),
                     ('gbdt', GradientBoostingClassifier(
-                        loss='exponential', n_estimators=500,
+                        loss='exponential', n_estimators=3000,
                         learning_rate=0.1, subsample=0.5))])
 
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
