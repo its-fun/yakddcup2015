@@ -572,7 +572,7 @@ def gbdt():
     E_in: 0.899593
     E_out: 0.88711101837711
     n_estimators: 3000, learning_rate: 0.1, subsample: 0.5
-    E_val:
+    E_val: 0.836049
     E_in:
     E_out:
     """
