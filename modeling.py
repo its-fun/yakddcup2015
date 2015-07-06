@@ -568,6 +568,9 @@ def gbdt():
     E_in: 0.908622
     E_out: 0.8873906795559863
     n_estimators: 500, learning_rate: 0.1, subsample: 0.5
+    E_val: 0.870976
+    E_in: 0.899593
+    E_out: 0.88711101837711
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
@@ -594,6 +597,11 @@ def gbdt():
 def gbdt2():
     """
     Submission: gbdt2_0706_02.csv
+    n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
+    E_val: 0.852035
+    E_in:
+    E_out:
+    n_estimators: 500, learning_rate: 0.1, subsample: 0.5
     E_val:
     E_in:
     E_out:
@@ -606,7 +614,7 @@ def gbdt2():
     X, y = dataset.load_train()
     clf = Pipeline([('scaler', StandardScaler()),
                     ('gbdt', GradientBoostingClassifier(
-                        loss='exponential', n_estimators=1000,
+                        loss='exponential', n_estimators=500,
                         learning_rate=0.1, subsample=0.5))])
 
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
@@ -618,6 +626,50 @@ def gbdt2():
     logger.debug('E_in: %f', Util.auc_score(clf, X, y))
 
     IO.dump_submission(clf, 'gbdt2_0706_02')
+
+
+def gbdt_grid():
+    """
+    Grid search for best params.
+    Submission: gbdt_grid_0706_03.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.grid_search import GridSearchCV
+    from sklearn.cross_validation import StratifiedKFold
+    from sklearn.pipeline import Pipeline
+    import numpy as np
+
+    X, y = dataset.load_train()
+    raw_scaler = StandardScaler()
+    X_scaled = raw_scaler.fit_transform(X)
+
+    param_grid = {
+        'n_estimators': np.arange(400, 1501, 100),
+        'learning_rate': [0.05, 0.1],
+        'subsample': [0.3, 0.5, 0.7]
+    }
+
+    grid = GridSearchCV(GradientBoostingClassifier(), param_grid,
+                        scoring='roc_auc', n_jobs=-1, cv=StratifiedKFold(y, 5),
+                        verbose=1)
+    grid.fit(X_scaled, y)
+
+    logger.debug('Got best GBDT.')
+    logger.debug('Grid scores: %s', grid.grid_scores_)
+    logger.debug('Best score (E_val): %s', grid.best_score_)
+    logger.debug('Best params: %s', grid.best_params_)
+    IO.cache(grid, Path.of_cache('gbdt_grid.GridSearchCV.pkl'))
+
+    logger.debug('E_in: %f', Util.auc_score(grid, X_scaled, y))
+
+    X_test = dataset.load_test()
+    raw_scaler.fit(np.r_[X, X_test])
+    IO.dump_submission(Pipeline([('scaler', raw_scaler),
+                                 ('gbdt', grid)]), 'gbdt_grid_0706_03')
 
 
 if __name__ == '__main__':
