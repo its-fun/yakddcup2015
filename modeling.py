@@ -576,12 +576,14 @@ def gbdt():
 
     X, y = dataset.load_train()
     clf = Pipeline([('scaler', StandardScaler()),
-                    ('gbdt', GradientBoostingClassifier())])
+                    ('gbdt', GradientBoostingClassifier(n_estimators=400,
+                                                        learning_rate=0.1))])
 
     param_grid = {
-        'gbdt__n_estimators': np.arange(100, 501, 100),
-        'gbdt__learning_rate': np.logspace(-2, -1, 5),
-        'gbdt__subsample': np.linspace(0.3, 0.7, 5)
+        # 'gbdt__n_estimators': np.arange(100, 501, 100),
+        # 'gbdt__learning_rate': np.logspace(-2, -1, 5),
+        # 'gbdt__subsample': np.linspace(0.3, 0.7, 5)
+        'gbdt__subsample': np.linspace(0.3, 0.7, 3)
     }
 
     grid = GridSearchCV(clf, param_grid, scoring='roc_auc', n_jobs=-1,
