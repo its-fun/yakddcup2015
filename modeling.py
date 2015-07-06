@@ -474,13 +474,7 @@ def erf2():
     logger.debug('cached fitted ExtraTreesClassifier')
 
 
-def gbdt():
-    """
-    Submission:
-    E_val:
-    E_in:
-    E_out:
-    """
+def gbdt_oob():
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.cross_validation import KFold, train_test_split
@@ -501,7 +495,7 @@ def gbdt():
 
     gb.fit(X_train, y_train)
 
-    IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
+    # IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
 
     logger.debug('Eval: %f', Util.auc_score(gb, X_test, y_test))
     logger.debug('Ein: %f', Util.auc_score(gb, X_train, y_train))
@@ -538,9 +532,9 @@ def gbdt():
     test_color = list(map(lambda x: x / 256.0, (127, 201, 127)))
     cv_color = list(map(lambda x: x / 256.0, (253, 192, 134)))
 
-    IO.cache(cumsum, Path.of_cache('gbdt.cumsum.pkl'))
-    IO.cache(test_score, Path.of_cache('gbdt.test_score.pkl'))
-    IO.cache(cv_score, Path.of_cache('gbdt.cv_score.pkl'))
+    # IO.cache(cumsum, Path.of_cache('gbdt.cumsum.pkl'))
+    # IO.cache(test_score, Path.of_cache('gbdt.test_score.pkl'))
+    # IO.cache(cv_score, Path.of_cache('gbdt.cv_score.pkl'))
 
     pl.plot(x, cumsum, label='OOB loss', color=oob_color)
     pl.plot(x, test_score, label='Test loss', color=test_color)
@@ -564,6 +558,45 @@ def gbdt():
     pl.xlabel('number of iterations')
 
     pl.savefig('gbdt.oob')
+
+
+def gbdt():
+    """
+    Submission: gbdt_0706_01.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.ensemble import GradientBoostingClassifier
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.cross_validation import StratifiedKFold
+    from sklearn.grid_search import GridSearchCV
+    import numpy as np
+
+    X, y = dataset.load_train()
+    clf = Pipeline([('scaler', StandardScaler()),
+                    ('gbdt', GradientBoostingClassifier())])
+
+    param_grid = {
+        'gbdt__n_estimators': np.arange(100, 501, 100),
+        'gbdt__learning_rate': np.logspace(-2, -1, 5),
+        'gbdt__subsample': np.linspace(0.3, 0.7, 5)
+    }
+
+    grid = GridSearchCV(clf, param_grid, scoring='roc_auc', n_jobs=-1,
+                        cv=StratifiedKFold(y, 5))
+    grid.fit(X, y)
+
+    logger.debug('Got best GBDT.')
+    logger.debug('Grid scores: %s', grid.grid_scores_)
+    logger.debug('Best score (E_val): %s', grid.best_score_)
+    logger.debug('Best params: %s', grid.best_params_)
+    IO.cache(grid, Path.of_cache('gbdt.GridSearchCV.pkl'))
+
+    logger.debug('Ein: %f', Util.auc_score(clf, X, y))
+
+    IO.dump_submission(clf, 'gbdt_0706_01')
 
 
 if __name__ == '__main__':
