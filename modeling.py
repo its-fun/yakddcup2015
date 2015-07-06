@@ -573,7 +573,7 @@ def gbdt():
     E_out: 0.88711101837711
     n_estimators: 3000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.836049
-    E_in:
+    E_in: 0.936056
     E_out:
     """
     from sklearn.ensemble import GradientBoostingClassifier
@@ -606,9 +606,9 @@ def gbdt2():
     E_in: 0.910251
     E_out: 0.8874428893001793
     n_estimators: 3000, learning_rate: 0.1, subsample: 0.5
-    E_val:
-    E_in:
-    E_out:
+    E_val: 0.827988
+    E_in: 0.938593
+    E_out: 0.8844206314551558
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
@@ -635,10 +635,11 @@ def gbdt2():
 def gbdt_grid():
     """
     Grid search for best params.
+    Best params: {'learning_rate': 0.05, 'subsample': 0.3}
     Submission: gbdt_grid_0706_03.csv
-    E_val:
-    E_in:
-    E_out:
+    E_val: 0.860118290628
+    E_in: 0.882949
+    E_out: 0.8809314555068068
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
