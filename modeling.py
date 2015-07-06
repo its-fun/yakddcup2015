@@ -563,9 +563,11 @@ def gbdt_oob():
 def gbdt():
     """
     Submission: gbdt_0706_01.csv
+    n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.858235
-    E_in:
-    E_out:
+    E_in: 0.908622
+    E_out: 0.8873906795559863
+    n_estimators: 500, learning_rate: 0.1, subsample: 0.5
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
@@ -575,7 +577,7 @@ def gbdt():
     X, y = dataset.load_train()
     clf = Pipeline([('scaler', StandardScaler()),
                     ('gbdt', GradientBoostingClassifier(
-                        n_estimators=1000, learning_rate=0.1, subsample=0.5))])
+                        n_estimators=500, learning_rate=0.1, subsample=0.5))])
 
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
