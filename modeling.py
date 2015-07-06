@@ -577,7 +577,8 @@ def gbdt():
                     ('gbdt', GradientBoostingClassifier(
                         n_estimators=1000, learning_rate=0.1, subsample=0.5))])
 
-    scores = cross_val_score(clf, X, y, cv=5)
+    scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
+                             verbose=1)
 
     logger.debug('Got best GBDT.')
     logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
