@@ -119,7 +119,7 @@ def extract(base_date):
 
     op_time['delay'] = (op_time['time'] - op_time['start']).dt.days
     import events
-    op_time = pd.merge(op_time, events.enroll_duration(), how='left',
+    op_time = pd.merge(op_time, events.enroll_duration(log_all), how='left',
                        on='enrollment_id')
 
     op_last_week = op_time[

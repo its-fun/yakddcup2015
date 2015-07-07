@@ -74,7 +74,7 @@ def extract(base_date):
     log_all = log_all[log_all['time'] <= base_date]
     log_all['source_event'] = log_all['source'] + '-' + log_all['event']
 
-    log_all = pd.merge(log_all, enroll_duration(), how='left',
+    log_all = pd.merge(log_all, enroll_duration(log_all), how='left',
                        on='enrollment_id')
     log_all['day_diff'] = (log_all['time'] - log_all['st']).dt.days
     log_all['week_diff'] = log_all['day_diff'] // 7
@@ -359,8 +359,7 @@ def count_source_event(log, enroll_all):
 
 
 @IO.cache_to('enroll_duration')
-def enroll_duration():
-    log_all = IO.load_logs()
+def enroll_duration(log_all):
     enroll_t = log_all.groupby('enrollment_id')\
         .agg({'time': [np.min, np.max]})
     enroll_t.columns = ['st', 'et']
