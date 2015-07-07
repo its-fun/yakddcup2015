@@ -324,6 +324,10 @@ def rf():
     E_val: 0.872011
     E_in: 0.999998
     E_out: 0.8824869811781106
+    30000 trees
+    E_val:
+    E_in:
+    E_out:
     """
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
@@ -336,7 +340,7 @@ def rf():
     X_scaled = raw_scaler.transform(X)
     del X
 
-    rf = RandomForestClassifier(n_estimators=15000, oob_score=True, n_jobs=-1,
+    rf = RandomForestClassifier(n_estimators=30000, oob_score=True, n_jobs=-1,
                                 class_weight='auto')
     rf.fit(X_scaled, y)
 
@@ -345,14 +349,14 @@ def rf():
     import gc
     gc.collect()
 
-    logger.debug('Eval(oob): %f', rf.oob_score_)
-    logger.debug('Ein: %f', Util.auc_score(rf, X_scaled, y))
+    logger.debug('E_val(oob): %f', rf.oob_score_)
+    logger.debug('E_in: %f', Util.auc_score(rf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
                                  ('rf', rf)]), 'rf_0704_02')
 
     logger.debug('caching fitted RandomForestClassifier')
-    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.auto.pkl'))
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.30000.pkl'))
     logger.debug('cached fitted RandomForestClassifier')
 
 
@@ -764,14 +768,13 @@ def bagging_lr():
                                  ('bag', bag)]), 'bagging_lr_0707_02')
 
 
-def ada_boost_lr():
+def ada_boost_dt():
     """
-    Submission: ada_boost_lr_0707_03.csv
+    Submission: ada_boost_dt_0707_03.csv
     E_val:
     E_in:
     E_out:
     """
-    from sklearn.linear_model import LogisticRegression
     from sklearn.ensemble import AdaBoostClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.cross_validation import cross_val_score
@@ -783,8 +786,7 @@ def ada_boost_lr():
     raw_scaler.fit(X)
     X_scaled = raw_scaler.transform(X)
 
-    ab = AdaBoostClassifier(LogisticRegression(class_weight='auto'),
-                            n_estimators=300)
+    ab = AdaBoostClassifier(n_estimators=300)
 
     scores = cross_val_score(ab, X_scaled, y, cv=5, n_jobs=-1)
     logger.debug('CV: %s', scores)
@@ -795,7 +797,7 @@ def ada_boost_lr():
     logger.debug('E_in: %f', Util.auc_score(ab, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
-                                 ('ab', ab)]), 'ada_boost_lr_0707_03')
+                                 ('ab', ab)]), 'ada_boost_dt_0707_03')
 
 
 def svc_appr():
