@@ -12,6 +12,10 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 3. 尝试深度学习model，http://card.memect.com/?q=keras
 
+3. 尝试depth=1来生成训练集
+
+3. kNN
+
 4. GBDT: min_samples_leaf, max_depth ...
 
 5. RF: min_samples_leaf, max_depth ...
