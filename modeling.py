@@ -734,9 +734,9 @@ def gbdt_search():
                                  ('gbdt', grid)]), 'gbdt_search_0707_01')
 
 
-def ada_boost_lr():
+def bagging_lr():
     """
-    Submission: ada_boost_lr_0707_02.csv
+    Submission: bagging_lr_0707_02.csv
     E_val:
     E_in:
     E_out:
@@ -760,7 +760,7 @@ def ada_boost_lr():
     logger.debug('E_in: %f', Util.auc_score(bag, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
-                                 ('bag', bag)]), 'ada_boost_lr_0707_02')
+                                 ('bag', bag)]), 'bagging_lr_0707_02')
 
 
 def svc_appr():
