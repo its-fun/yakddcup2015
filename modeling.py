@@ -753,7 +753,7 @@ def bagging_lr():
     X_scaled = raw_scaler.transform(X)
 
     bag = BaggingClassifier(LogisticRegression(class_weight='auto'),
-                            n_estimators=300, oob_score=True, n_jobs=-1,
+                            n_estimators=3000, oob_score=True, n_jobs=-1,
                             verbose=2)
 
     logger.debug('E_val (oob): %f', bag.oob_score_)
