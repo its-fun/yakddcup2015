@@ -823,7 +823,7 @@ def svc_appr():
                             param_distributions={'C': expon()})
     rs.fit(X_scaled, y)
 
-    IO.cache(rs, Path.of_cache('svc_appr.RandomizedSearchCV.SVC.pkl'))
+    IO.cache(rs, Path.of_cache('svc_appr.RandomizedSearchCV.LinearSVC.pkl'))
 
     logger.debug('Got best SVC.')
     logger.debug('Best params: %s', rs.best_params_)
