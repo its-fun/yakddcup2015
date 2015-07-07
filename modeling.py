@@ -734,6 +734,35 @@ def gbdt_search():
                                  ('gbdt', grid)]), 'gbdt_search_0707_01')
 
 
+def ada_boost_lr():
+    """
+    Submission: ada_boost_lr_0707_02.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.ensemble import BaggingClassifier
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    bag = BaggingClassifier(LogisticRegression(class_weight='auto'),
+                            n_estimators=300, oob_score=True, n_jobs=-1,
+                            verbose=2)
+
+    logger.debug('E_val (oob): %f', bag.oob_score_)
+    logger.debug('E_in: %f', Util.auc_score(bag, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('bag', bag)]), 'ada_boost_lr_0707_02')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
