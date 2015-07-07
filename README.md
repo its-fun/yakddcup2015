@@ -6,7 +6,7 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 ## TODO
 
-1. 手工加入规则，比如关于课程最近更新时间、用户最近操作时间
+1. feature selection
 
 2. 观察预测错了的instance
 
