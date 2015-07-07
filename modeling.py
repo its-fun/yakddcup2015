@@ -763,6 +763,40 @@ def bagging_lr():
                                  ('bag', bag)]), 'bagging_lr_0707_02')
 
 
+def ada_boost_lr():
+    """
+    Submission: ada_boost_lr_0707_03.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.ensemble import AdaBoostClassifier
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.cross_validation import cross_val_score
+    from sklearn.pipeline import Pipeline
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    ab = AdaBoostClassifier(LogisticRegression(class_weight='auto'),
+                            n_estimators=300)
+
+    scores = cross_val_score(ab, X_scaled, y, cv=5, n_jobs=-1)
+    logger.debug('CV: %s', scores)
+    logger.debug('E_val: %f', sum(scores) / len(scores))
+
+    ab.fit(X_scaled, y)
+
+    logger.debug('E_in: %f', Util.auc_score(ab, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('ab', ab)]), 'ada_boost_lr_0707_03')
+
+
 def svc_appr():
     """
     Submission:
