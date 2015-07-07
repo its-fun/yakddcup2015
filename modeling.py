@@ -835,6 +835,46 @@ def svc_appr():
     logger.debug('E_in: %f', Util.auc_score(rs, X_scaled, y))
 
 
+def lr_with_scale3():
+    """
+    Check the performance of normalizing TEST SET.
+
+    Submission: lr_with_scale3_0707_04.csv
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    import numpy as np
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    clf = LogisticRegressionCV(Cs=50, cv=5, scoring='roc_auc', n_jobs=-1,
+                               class_weight='auto', refit=False)
+    clf.fit(X_scaled, y)
+    logger.debug('Best C: %f', clf.C_[0])
+    logger.debug('Cs: %s', clf.Cs_)
+    logger.debug('Grid scores: %f', clf.scores_)
+
+    clf = LogisticRegression(C=clf.C_[0], class_weight='auto')
+
+    raw_scaler.fit(np.c_[X, IO.load_test()])
+    X_scaled = raw_scaler.transform(X)
+
+    clf.fit(X_scaled, y)
+
+    logger.debug('E_in: %f', Util.auc_score(clf, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
+                                 ('lr', clf)]), 'lr_with_scale3_0707_04')
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
