@@ -763,6 +763,43 @@ def ada_boost_lr():
                                  ('bag', bag)]), 'ada_boost_lr_0707_02')
 
 
+def svc_appr():
+    """
+    Submission:
+    E_val:
+    E_in:
+    E_out:
+    """
+    from sklearn.svm import LinearSVC
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.pipeline import Pipeline
+    from sklearn.cross_validation import StratifiedKFold
+    from sklearn.grid_search import RandomizedSearchCV
+    from scipy.stats import expon
+
+    X, y = dataset.load_train()
+
+    raw_scaler = StandardScaler()
+    raw_scaler.fit(X)
+    X_scaled = raw_scaler.transform(X)
+
+    svc = LinearSVC(dual=False, class_weight='auto')
+    rs = RandomizedSearchCV(svc, n_iter=50, scoring='roc_auc', n_jobs=-1,
+                            cv=StratifiedKFold(y, 5),
+                            param_distributions={'C': expon()})
+    rs.fit(X_scaled, y)
+
+    IO.cache(rs, Path.of_cache('svc_appr.RandomizedSearchCV.SVC.pkl'))
+
+    logger.debug('Got best SVC.')
+    logger.debug('Best params: %s', rs.best_params_)
+    logger.debug('Grid scores:')
+    for i, grid_score in enumerate(rs.grid_scores_):
+        print('\t%s' % grid_score)
+    logger.debug('Best score (E_val): %s', rs.best_score_)
+    logger.debug('E_in: %f', Util.auc_score(rs, X_scaled, y))
+
+
 if __name__ == '__main__':
     from inspect import isfunction
     variables = locals()
