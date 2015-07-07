@@ -785,7 +785,7 @@ def svc_appr():
 
     svc = LinearSVC(dual=False, class_weight='auto')
     rs = RandomizedSearchCV(svc, n_iter=50, scoring='roc_auc', n_jobs=-1,
-                            cv=StratifiedKFold(y, 5),
+                            cv=StratifiedKFold(y, 5), verbose=2,
                             param_distributions={'C': expon()})
     rs.fit(X_scaled, y)
 
