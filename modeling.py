@@ -684,10 +684,11 @@ def gbdt_grid():
 def gbdt_search():
     """
     Grid search for best n_estimators.
+    Best params: {'loss': 'deviance', 'n_estimators': 100}
     Submission: gbdt_search_0707_01.csv
-    E_val:
-    E_in:
-    E_out:
+    E_val: 0.883786743214
+    E_in: 0.887785
+    E_out: 0.8848760405053878
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
