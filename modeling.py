@@ -866,7 +866,7 @@ def lr_with_scale3():
 
     clf = LogisticRegression(C=clf.C_[0], class_weight='auto')
 
-    raw_scaler.fit(np.c_[X, IO.load_test()])
+    raw_scaler.fit(np.c_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
 
     clf.fit(X_scaled, y)
