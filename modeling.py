@@ -574,7 +574,7 @@ def gbdt():
     n_estimators: 3000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.836049
     E_in: 0.936056
-    E_out:
+    E_out: 0.8833930861722906
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
