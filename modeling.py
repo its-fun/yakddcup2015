@@ -771,9 +771,9 @@ def bagging_lr():
 def ada_boost_dt():
     """
     Submission: ada_boost_dt_0707_03.csv
-    E_val:
-    E_in:
-    E_out:
+    E_val: 0.854350
+    E_in: 0.889561
+    E_out: 0.8832315976033993
     """
     from sklearn.ensemble import AdaBoostClassifier
     from sklearn.preprocessing import StandardScaler
