@@ -12,11 +12,11 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 3. 尝试深度学习model，http://card.memect.com/?q=keras
 
-4. LR, SVC(linear/poly/rbf)
+4. GBDT: min_samples_leaf, max_depth ...
 
-5. Nearest Neighbors, Naive Bayes
+5. RF: min_samples_leaf, max_depth ...
 
-6. http://scikit-learn.org/stable/modules/ensemble.html: GBDT, RF, AdaBoost(with LR/DT/SVC)
+6. AdaBoost(with LR/SVC)
 
 7. 把测试集拿来一起做normalize
 
