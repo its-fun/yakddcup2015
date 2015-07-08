@@ -202,7 +202,11 @@ if __name__ == '__main__':
             os.remove(f)
 
     elif sys.argv[1] == 'gen':
-        X, y = load_train(depth=1)
+        d = 1
+        if len(sys.argv) > 2:
+            d = int(sys.argv[2])
+        print('depth: %d' % d)
+        X, y = load_train(depth=d)
         print('X.shape: %d x %d' % X.shape)
         print('y.shape: %d' % y.shape)
         X_test = load_test()
