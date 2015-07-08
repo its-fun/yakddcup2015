@@ -329,7 +329,7 @@ def rf():
     E_in:
     E_out:
 
-    depth=4, 15000 trees
+    depth=4; 15000 trees
     E_val:
     E_in:
     E_out:
@@ -586,7 +586,7 @@ def gbdt():
     E_in: 0.936056
     E_out: 0.8833930861722906
 
-    depth=4, n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
+    depth=4; n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val:
     E_in:
     E_out:
@@ -630,27 +630,37 @@ def gbdt2():
     E_val: 0.827988
     E_in: 0.938593
     E_out: 0.8844206314551558
+
+    depth=4; n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
+    E_val:
+    E_in:
+    E_out:
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
     from sklearn.cross_validation import cross_val_score
+    import numpy as np
 
     X, y = dataset.load_train()
-    clf = Pipeline([('scaler', StandardScaler()),
-                    ('gbdt', GradientBoostingClassifier(
-                        loss='exponential', n_estimators=3000,
-                        learning_rate=0.1, subsample=0.5))])
+    raw_scaler = StandardScaler()
+    gb = GradientBoostingClassifier(loss='exponential', n_estimators=1000,
+                                    learning_rate=0.1, subsample=0.5)
 
+    clf = Pipeline([('scaler', raw_scaler), ('gbdt', gb)])
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
     logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
 
-    clf.fit(X, y)
-    IO.cache(clf, Path.of_cache('gbdt2.Pipeline.pkl'))
-    logger.debug('E_in: %f', Util.auc_score(clf, X, y))
+    raw_scaler.fit(np.r_[X, dataset.load_test()])
+    X_scaled = raw_scaler.transform(X)
+    gb.fit(X_scaled, y)
 
-    IO.dump_submission(clf, 'gbdt2_0706_02')
+    IO.cache(gb, Path.of_cache('gbdt2.GradientBoostingClassifier.pkl'))
+    logger.debug('E_in: %f', Util.auc_score(gb, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
+                       'gbdt2_0708_03')
 
 
 def gbdt_grid():
