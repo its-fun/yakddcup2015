@@ -49,13 +49,15 @@ in the enrollment period (4)
 + coefficients b and c in the polynomial model y = a + bx + cx**2, where x
 is week number (all start from 0), and y is the weekly number of events (2)
 
-+ 7 counts of events in Monday to Sunday (7)
++ 7 counts of events in Monday to Sunday, by event-source pairs, and ratio on
+total counts (203)
 
-+ 24 counts of events in hour 0-23 (24)
++ 24 counts of events in hour 0-23, by event-source pairs, and ratio on total
+counts (696)
 
-+ 7 counts of event types (7)
++ 7 counts of event types, and ratio on total counts (14)
 
-+ 2 counts of source types (2)
++ 2 counts of source types, and ratio on total counts (4)
 
 
 ### Session (45)

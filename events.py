@@ -25,13 +25,15 @@ events in the enrollment period
 where x is week number (all start from 0), and y is the weekly number of
 events
 
-132~138: 7 counts of events in Monday to Sunday
+132~138: 7 counts of events in Monday to Sunday, by event-source pairs,
+and ratio on total counts
 
-139~162: 24 counts of events in hour 0-23
+139~162: 24 counts of events in hour 0-23, by event-source pairs,
+and ratio on total counts
 
-163~169: 7 counts of event types
+163~169: 7 counts of event types, and ratio on total counts
 
-170~171: 2 counts of source types
+170~171: 2 counts of source types, and ratio on total counts
 """
 
 
