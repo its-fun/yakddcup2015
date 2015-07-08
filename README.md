@@ -8,7 +8,7 @@ Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Diverge
 
 0. 加特征：每个计数特征都应该有对应的比例特征；其他特征
 
-0. 加数据：最多可以到depth=4；注意需要先review一下代码中有没有潜在的问题
+0. 加数据：最多可以到depth=4
 
 1. feature selection
 
