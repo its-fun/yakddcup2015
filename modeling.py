@@ -362,7 +362,7 @@ def rf():
                                  ('rf', rf)]), 'rf_0708_01')
 
     logger.debug('caching fitted RandomForestClassifier')
-    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.30000.pkl'))
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.15000.pkl'))
     logger.debug('cached fitted RandomForestClassifier')
 
 
@@ -599,13 +599,13 @@ def gbdt():
 
     X, y = dataset.load_train(depth=4)
     raw_scaler = StandardScaler()
+    X_scaled = raw_scaler.fit_transform(X)
+
     gb = GradientBoostingClassifier(n_estimators=1000, learning_rate=0.1,
                                     subsample=0.5)
 
-    clf = Pipeline([('scaler', raw_scaler), ('gbdt', gb)])
-    scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
+    scores = cross_val_score(gb, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
-
     logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
 
     raw_scaler.fit(np.r_[X, dataset.load_test()])
@@ -644,11 +644,12 @@ def gbdt2():
 
     X, y = dataset.load_train(depth=4)
     raw_scaler = StandardScaler()
+    X_scaled = raw_scaler.fit_transform(X)
+
     gb = GradientBoostingClassifier(loss='exponential', n_estimators=1000,
                                     learning_rate=0.1, subsample=0.5)
 
-    clf = Pipeline([('scaler', raw_scaler), ('gbdt', gb)])
-    scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
+    scores = cross_val_score(gb, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
     logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
 
