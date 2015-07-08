@@ -339,7 +339,7 @@ def rf():
     from sklearn.ensemble import RandomForestClassifier
     import numpy as np
 
-    X, y = dataset.load_train()
+    X, y = dataset.load_train(depth=4)
 
     raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
@@ -572,7 +572,7 @@ def gbdt_oob():
 
 def gbdt():
     """
-    Submission: gbdt_0706_01.csv
+    Submission: gbdt_0708_02.csv
     n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.858235
     E_in: 0.908622
@@ -585,27 +585,35 @@ def gbdt():
     E_val: 0.836049
     E_in: 0.936056
     E_out: 0.8833930861722906
+
+    depth=4,
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
     from sklearn.cross_validation import cross_val_score
+    import numpy as np
 
     X, y = dataset.load_train()
-    clf = Pipeline([('scaler', StandardScaler()),
-                    ('gbdt', GradientBoostingClassifier(
-                        n_estimators=3000, learning_rate=0.1, subsample=0.5))])
+    raw_scaler = StandardScaler()
+    gb = GradientBoostingClassifier(n_estimators=3000, learning_rate=0.1,
+                                    subsample=0.5)
 
+    clf = Pipeline([('scaler', raw_scaler), ('gbdt', gb)])
     scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
                              verbose=1)
 
     logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
 
-    clf.fit(X, y)
-    IO.cache(clf, Path.of_cache('gbdt.Pipeline.pkl'))
-    logger.debug('E_in: %f', Util.auc_score(clf, X, y))
+    raw_scaler.fit(np.r_[X, dataset.load_test()])
+    X_scaled = raw_scaler.transform(X)
+    gb.fit(X_scaled, y)
 
-    IO.dump_submission(clf, 'gbdt_0706_01')
+    IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
+    logger.debug('E_in: %f', Util.auc_score(gb, X_scaled, y))
+
+    IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
+                       'gbdt_0708_02')
 
 
 def gbdt2():
