@@ -594,7 +594,7 @@ def gbdt():
     from sklearn.cross_validation import cross_val_score
     import numpy as np
 
-    X, y = dataset.load_train()
+    X, y = dataset.load_train(depth=4)
     raw_scaler = StandardScaler()
     gb = GradientBoostingClassifier(n_estimators=3000, learning_rate=0.1,
                                     subsample=0.5)
