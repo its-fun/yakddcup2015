@@ -802,6 +802,8 @@ def ada_boost_dt():
 
 def svc_appr():
     """
+    Best params: {'C': 0.022139881953014046}
+
     Submission:
     E_val:
     E_in:
