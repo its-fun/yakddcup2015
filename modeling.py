@@ -843,8 +843,8 @@ def lr_with_scale3():
 
     Submission: lr_with_scale3_0707_04.csv
     E_val:
-    E_in:
-    E_out:
+    E_in: 0.879233
+    E_out: 0.8770121701777971
     """
     from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
     from sklearn.preprocessing import StandardScaler
