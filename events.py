@@ -154,36 +154,40 @@ def extract(base_date):
     log_all['week_day'] = log_all['time'].dt.dayofweek
     log_all['hour'] = log_all['time'].dt.hour
 
-    week_day_counts = log_all.groupby(['enrollment_id', 'week_day'])\
-        .agg({'count': np.sum}).reset_index()
-    week_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday',
-                 'Saturday', 'Sunday']
-    for i, wd in enumerate(week_days):
-        week_day_counts[wd] = 0
-        week_day_counts.loc[week_day_counts['week_day'] == i, wd] += \
-            week_day_counts[week_day_counts['week_day'] == i]['count']
-    del week_day_counts['week_day']
-    del week_day_counts['count']
-
     # 132~138: 7 counts of events in Monday to Sunday
-    WD = week_day_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+    _E_TOTAL, _, _ = count_source_event(log_all, enroll_all)
+    WD = enroll_all
+    for w in range(7):
+        _E, _, _ = count_source_event(log_all[log_all['week_day'] == w],
+                                      enroll_all)
+        for se in SE_PAIRS:
+            _E[se + '_ratio_se'] = _E[se] / _E_TOTAL[se]
+            _E[se + '_ratio_day'] = _E[se] / _E['count']
+        WD = pd.merge(WD, _E, how='left', on='enrollment_id')
+
+    del WD['username']
+    del WD['course_id']
 
     logger.debug('132~138')
 
-    hour_counts = log_all.groupby(['enrollment_id', 'hour'])\
-        .agg({'count': np.sum}).reset_index()
-    for i in range(24):
-        c = str(i)
-        hour_counts[c] = 0
-        hour_counts.loc[hour_counts['hour'] == i, c] += \
-            hour_counts[hour_counts['hour'] == i]['count']
-    del hour_counts['hour']
-    del hour_counts['count']
-
     # 139~162: 24 counts of events in hour 0-23
-    H = hour_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+    H = enroll_all
+    for h in range(24):
+        _E, _, _ = count_source_event(log_all[log_all['hour'] == h],
+                                      enroll_all)
+        for se in SE_PAIRS:
+            _E[se + '_ratio_se'] = _E[se] / _E_TOTAL[se]
+            _E[se + '_ratio_hour'] = _E[se] / _E['count']
+        H = pd.merge(H, _E, how='left', on='enrollment_id')
+
+    del H['username']
+    del H['course_id']
 
     logger.debug('139~162')
+
+    _EVENT_TOTAL = log_all.groupby('enrollment_id').agg({'count': np.sum})
+    _EVENT_TOTAL.columns = ['total_events_count']
+    _EVENT_TOTAL.reset_index(inplace=True)
 
     event_counts = log_all.groupby(['enrollment_id', 'event'])\
         .agg({'count': np.sum}).reset_index()
@@ -198,6 +202,10 @@ def extract(base_date):
 
     # 163~169: 7 counts of event types
     E = event_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+    E = pd.merge(E, _EVENT_TOTAL, how='left', on='enrollment_id')
+    for e in event_types:
+        E[e + '_ratio'] = E[e] / E['total_events_count']
+    del E['total_events_count']
 
     logger.debug('163~169')
 
@@ -212,6 +220,10 @@ def extract(base_date):
 
     # 170~171: 2 counts of source types
     S = source_counts.groupby('enrollment_id').agg(np.sum).reset_index()
+    S = pd.merge(S, _EVENT_TOTAL, how='left', on='enrollment_id')
+    for s in ['server', 'browser']:
+        S[s + '_ratio'] = S[s] / S['total_events_count']
+    del S['total_events_count']
 
     logger.debug('170~171')
 
