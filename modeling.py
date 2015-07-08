@@ -599,7 +599,7 @@ def gbdt():
 
     X, y = dataset.load_train(depth=4)
     raw_scaler = StandardScaler()
-    gb = GradientBoostingClassifier(n_estimators=3000, learning_rate=0.1,
+    gb = GradientBoostingClassifier(n_estimators=1000, learning_rate=0.1,
                                     subsample=0.5)
 
     clf = Pipeline([('scaler', raw_scaler), ('gbdt', gb)])
@@ -621,7 +621,7 @@ def gbdt():
 
 def gbdt2():
     """
-    Submission: gbdt2_0706_02.csv
+    Submission: gbdt2_0708_03.csv
     n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.852035
     E_in: 0.910251
