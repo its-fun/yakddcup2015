@@ -315,7 +315,7 @@ def lr_with_scale2():
 
 def rf():
     """
-    Submission: rf_0704_02.csv
+    Submission: rf_0708_01.csv
     3000 trees
     E_val: 0.871837
     E_in: 0.999998
@@ -328,19 +328,25 @@ def rf():
     E_val: 0.871928
     E_in:
     E_out:
+
+    depth=4, 15000 trees
+    E_val:
+    E_in:
+    E_out:
     """
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
     from sklearn.ensemble import RandomForestClassifier
+    import numpy as np
 
     X, y = dataset.load_train()
 
     raw_scaler = StandardScaler()
-    raw_scaler.fit(X)
+    raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
     del X
 
-    rf = RandomForestClassifier(n_estimators=30000, oob_score=True, n_jobs=-1,
+    rf = RandomForestClassifier(n_estimators=15000, oob_score=True, n_jobs=-1,
                                 class_weight='auto')
     rf.fit(X_scaled, y)
 
@@ -353,7 +359,7 @@ def rf():
     logger.debug('E_in: %f', Util.auc_score(rf, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
-                                 ('rf', rf)]), 'rf_0704_02')
+                                 ('rf', rf)]), 'rf_0708_01')
 
     logger.debug('caching fitted RandomForestClassifier')
     IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.30000.pkl'))
