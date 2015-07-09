@@ -329,7 +329,7 @@ def rf():
     E_in:
     E_out:
 
-    depth=4; 15000 trees
+    depth=4; 12000 trees
     E_val: 0.969158
     E_in:
     E_out:
@@ -339,12 +339,14 @@ def rf():
     from sklearn.ensemble import RandomForestClassifier
     import numpy as np
 
-    X, y = dataset.load_train(depth=4)
+    X, y = dataset.load_train(depth=1)
 
     raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
     del X
+    import gc
+    gc.collect()
 
     rf = RandomForestClassifier(n_estimators=12000, oob_score=True, n_jobs=-1,
                                 class_weight='auto')
@@ -352,17 +354,20 @@ def rf():
 
     logger.debug('RandomForestClassifier fitted')
 
-    import gc
-    gc.collect()
-
     logger.debug('E_val(oob): %f', rf.oob_score_)
-    logger.debug('E_in: %f', Util.auc_score(rf, X_scaled, y))
+    logger.debug('E_in(full): %f', Util.auc_score(rf, X_scaled, y))
+
+    X, y = dataset.load_train()
+    X_scaled = raw_scaler.transform(X)
+    logger.debug('E_in (depth=0): %f', Util.auc_score(rf, X_scaled, y))
+    del X
+    gc.collect()
 
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
                                  ('rf', rf)]), 'rf_0708_01')
 
     logger.debug('caching fitted RandomForestClassifier')
-    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.15000.pkl'))
+    IO.cache(rf, Path.of_cache('rf.RandomForestClassifier.12000.pkl'))
     logger.debug('cached fitted RandomForestClassifier')
 
 
@@ -597,7 +602,7 @@ def gbdt():
     from sklearn.cross_validation import cross_val_score
     import numpy as np
 
-    X, y = dataset.load_train(depth=4)
+    X, y = dataset.load_train(depth=1)
     raw_scaler = StandardScaler()
     X_scaled = raw_scaler.fit_transform(X)
 
@@ -613,7 +618,11 @@ def gbdt():
     gb.fit(X_scaled, y)
 
     IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
-    logger.debug('E_in: %f', Util.auc_score(gb, X_scaled, y))
+    logger.debug('E_in(full): %f', Util.auc_score(gb, X_scaled, y))
+
+    X, y = dataset.load_train()
+    X_scaled = raw_scaler.transform(X)
+    logger.debug('E_in(depth=0): %f', Util.auc_score(gb, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
                        'gbdt_0708_02')
@@ -642,7 +651,7 @@ def gbdt2():
     from sklearn.cross_validation import cross_val_score
     import numpy as np
 
-    X, y = dataset.load_train(depth=4)
+    X, y = dataset.load_train(depth=1)
     raw_scaler = StandardScaler()
     X_scaled = raw_scaler.fit_transform(X)
 
@@ -658,7 +667,11 @@ def gbdt2():
     gb.fit(X_scaled, y)
 
     IO.cache(gb, Path.of_cache('gbdt2.GradientBoostingClassifier.pkl'))
-    logger.debug('E_in: %f', Util.auc_score(gb, X_scaled, y))
+    logger.debug('E_in(full): %f', Util.auc_score(gb, X_scaled, y))
+
+    X, y = dataset.load_train()
+    X_scaled = raw_scaler.transform(X)
+    logger.debug('E_in(depth=0): %f', Util.auc_score(gb, X_scaled, y))
 
     IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
                        'gbdt2_0708_03')
