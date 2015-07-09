@@ -588,7 +588,7 @@ def gbdt():
 
     depth=4; n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.947301
-    E_in:
+    E_in: 0.983812
     E_out:
     """
     from sklearn.ensemble import GradientBoostingClassifier
@@ -633,7 +633,7 @@ def gbdt2():
 
     depth=4; n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.941602
-    E_in:
+    E_in: 0.983938
     E_out:
     """
     from sklearn.ensemble import GradientBoostingClassifier
