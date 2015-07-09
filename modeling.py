@@ -330,7 +330,7 @@ def rf():
     E_out:
 
     depth=4; 15000 trees
-    E_val:
+    E_val: 0.969158
     E_in:
     E_out:
     """
@@ -346,7 +346,7 @@ def rf():
     X_scaled = raw_scaler.transform(X)
     del X
 
-    rf = RandomForestClassifier(n_estimators=15000, oob_score=True, n_jobs=-1,
+    rf = RandomForestClassifier(n_estimators=12000, oob_score=True, n_jobs=-1,
                                 class_weight='auto')
     rf.fit(X_scaled, y)
 
