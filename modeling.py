@@ -594,7 +594,7 @@ def gbdt():
     depth=4; n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.947301
     E_in: 0.983812 (on depth=4) // 0.85089646325496504 (on depth=0)
-    E_out:
+    E_out: 0.8855316272153549
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
@@ -643,7 +643,7 @@ def gbdt2():
     depth=4; n_estimators: 1000, learning_rate: 0.1, subsample: 0.5
     E_val: 0.941602
     E_in: 0.983938 (on depth=4) // 0.87209181108731892 (on depth=0)
-    E_out:
+    E_out: 0.8872206627768779
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
