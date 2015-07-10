@@ -155,8 +155,8 @@ def extract(base_date):
     log_all['hour'] = log_all['time'].dt.hour
 
     # 132~138: 7 counts of events in Monday to Sunday
-    _E_TOTAL, _, _ = count_source_event(log_all, enroll_all)\
-        .rename(columns=lambda c: c + '_total')
+    _E_TOTAL, _, _ = count_source_event(log_all, enroll_all)
+    _E_TOTAL.rename(columns=lambda c: c + '_total', inplace=True)
     WD = enroll_all
     for w in range(7):
         _E, _, _ = count_source_event(log_all[log_all['week_day'] == w],
