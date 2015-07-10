@@ -188,6 +188,9 @@ def load_train(depth=0):
         enroll_ids = __enroll_ids_with_log__(log_all, enroll_ids, base_date)
 
     logger.debug('train set loaded')
+
+    if np.any(np.isinf(X)):
+        logger.debug('train set has INF')
     return X, y
 
 
