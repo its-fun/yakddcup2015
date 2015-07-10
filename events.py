@@ -155,15 +155,20 @@ def extract(base_date):
     log_all['hour'] = log_all['time'].dt.hour
 
     # 132~138: 7 counts of events in Monday to Sunday
-    _E_TOTAL, _, _ = count_source_event(log_all, enroll_all)
+    _E_TOTAL, _, _ = count_source_event(log_all, enroll_all)\
+        .rename(columns=lambda c: c + '_total')
     WD = enroll_all
     for w in range(7):
         _E, _, _ = count_source_event(log_all[log_all['week_day'] == w],
                                       enroll_all)
+        _E_W = pd.merge(_E, _E_TOTAL, how='left', on='enrollment_id')
         for se in SE_PAIRS:
-            _E[se + '_ratio_se'] = _E[se] / _E_TOTAL[se]
-            _E[se + '_ratio_day'] = _E[se] / _E['count']
-        WD = pd.merge(WD, _E, how='left', on='enrollment_id')
+            _E_W[se + '_ratio_se'] = _E_W[se] / _E_W[se + '_total']
+            _E_W[se + '_ratio_day'] = _E_W[se] / _E_W['count']
+        for c in _E_W.columns.values:
+            if c.endswith('_total'):
+                del _E_W[c]
+        WD = pd.merge(WD, _E_W, how='left', on='enrollment_id')
 
     del WD['username']
     del WD['course_id']
@@ -175,10 +180,14 @@ def extract(base_date):
     for h in range(24):
         _E, _, _ = count_source_event(log_all[log_all['hour'] == h],
                                       enroll_all)
+        _E_H = pd.merge(_E, _E_TOTAL, how='left', on='enrollment_id')
         for se in SE_PAIRS:
-            _E[se + '_ratio_se'] = _E[se] / _E_TOTAL[se]
-            _E[se + '_ratio_hour'] = _E[se] / _E['count']
-        H = pd.merge(H, _E, how='left', on='enrollment_id')
+            _E_H[se + '_ratio_se'] = _E_H[se] / _E_H[se + '_total']
+            _E_H[se + '_ratio_hour'] = _E_H[se] / _E_H['count']
+        for c in _E_H.columns.values:
+            if c.endswith('_total'):
+                del _E_H[c]
+        H = pd.merge(H, _E_H, how='left', on='enrollment_id')
 
     del H['username']
     del H['course_id']
