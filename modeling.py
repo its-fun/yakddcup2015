@@ -644,6 +644,21 @@ def gbdt2():
     E_val: 0.941602
     E_in: 0.983938 (on depth=4) // 0.87209181108731892 (on depth=0)
     E_out: 0.8872206627768779
+
+    depth=1:
+    E_val:
+    E_in: 0.956762 // 0.903489
+    E_out:
+
+    depth=2:
+    E_val:
+    E_in: 0.971240 // 0.899843
+    E_out:
+
+    depth=3:
+    E_val:
+    E_in: 0.978190 // 0.896956
+    E_out:
     """
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
@@ -653,7 +668,7 @@ def gbdt2():
     gb = GradientBoostingClassifier(loss='exponential', n_estimators=1000,
                                     learning_rate=0.1, subsample=0.5)
 
-    X, y = dataset.load_train(depth=1)
+    X, y = dataset.load_train()
     raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
