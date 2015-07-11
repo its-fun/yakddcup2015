@@ -604,15 +604,16 @@ def gbdt():
     gb = GradientBoostingClassifier(n_estimators=1000, learning_rate=0.1,
                                     subsample=0.5)
 
-    X, y = dataset.load_train()
+    d = 0
+    X, y = dataset.load_train(depth=d)
     raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
     gb.fit(X_scaled, y)
 
-    IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
+    IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.d%d.pkl' % d))
     IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
-                       'gbdt_0708_02')
+                       'gbdt_0708_02.1000.d%d' % d)
 
     logger.debug('E_in(full): %f', Util.auc_score(gb, X_scaled, y))
 
@@ -661,15 +662,16 @@ def gbdt2():
     gb = GradientBoostingClassifier(loss='exponential', n_estimators=1000,
                                     learning_rate=0.1, subsample=0.5)
 
-    X, y = dataset.load_train()
+    d = 0
+    X, y = dataset.load_train(depth=d)
     raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
     gb.fit(X_scaled, y)
 
-    IO.cache(gb, Path.of_cache('gbdt2.GradientBoostingClassifier.pkl'))
+    IO.cache(gb, Path.of_cache('gbdt2.GradientBoostingClassifier.d%d.pkl' % d))
     IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
-                       'gbdt2_0708_03')
+                       'gbdt2_0708_03.1000.d%d' % d)
 
     logger.debug('E_in(full): %f', Util.auc_score(gb, X_scaled, y))
 
