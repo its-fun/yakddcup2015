@@ -662,7 +662,7 @@ def gbdt2():
     gb = GradientBoostingClassifier(loss='exponential', n_estimators=1000,
                                     learning_rate=0.1, subsample=0.5)
 
-    d = 0
+    d = 3
     X, y = dataset.load_train(depth=d)
     raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
