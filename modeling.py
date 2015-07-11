@@ -602,7 +602,7 @@ def gbdt():
     from sklearn.cross_validation import cross_val_score
     import numpy as np
 
-    X, y = dataset.load_train(depth=1)
+    X, y = dataset.load_train()
     raw_scaler = StandardScaler()
     X_scaled = raw_scaler.fit_transform(X)
 
