@@ -93,6 +93,9 @@ def extract(base_date):
               for dt in [timedelta(hours=3), timedelta(hours=1),
                          timedelta(hours=12), timedelta(days=1),
                          timedelta(days=7)]]
+    log_problem = log_all[log_all['event'] == 'problem']
+    params += [(log_problem, dt)
+               for dt in [timedelta(hours=3), timedelta(hours=1)]]
     pool = par.Pool(processes=min(n_proc, len(params)))
     X = enroll_all
     for dt, X_ in pool.map(__get_features__, params):
