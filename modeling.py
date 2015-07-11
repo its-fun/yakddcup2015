@@ -599,33 +599,26 @@ def gbdt():
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.preprocessing import StandardScaler
     from sklearn.pipeline import Pipeline
-    from sklearn.cross_validation import cross_val_score
     import numpy as np
-
-    X, y = dataset.load_train()
-    raw_scaler = StandardScaler()
-    X_scaled = raw_scaler.fit_transform(X)
 
     gb = GradientBoostingClassifier(n_estimators=1000, learning_rate=0.1,
                                     subsample=0.5)
 
-    scores = cross_val_score(gb, X, y, cv=5, scoring='roc_auc', n_jobs=-1,
-                             verbose=1)
-    logger.debug('E_val: %f <- %s', sum(scores) / len(scores), scores)
-
+    X, y = dataset.load_train()
+    raw_scaler = StandardScaler()
     raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
     gb.fit(X_scaled, y)
 
     IO.cache(gb, Path.of_cache('gbdt.GradientBoostingClassifier.pkl'))
+    IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
+                       'gbdt_0708_02')
+
     logger.debug('E_in(full): %f', Util.auc_score(gb, X_scaled, y))
 
     X, y = dataset.load_train()
     X_scaled = raw_scaler.transform(X)
     logger.debug('E_in(depth=0): %f', Util.auc_score(gb, X_scaled, y))
-
-    IO.dump_submission(Pipeline([('scaler', raw_scaler), ('gbdt', gb)]),
-                       'gbdt_0708_02')
 
 
 def gbdt2():
