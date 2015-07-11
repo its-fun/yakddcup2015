@@ -641,7 +641,7 @@ def gbdt2():
     depth=1:
     E_val:
     E_in: 0.956762 // 0.903489
-    E_out:
+    E_out: 0.8835439618156952
 
     depth=2:
     E_val:
