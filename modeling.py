@@ -639,10 +639,15 @@ def gbdt2():
     E_in: 0.983938 (on depth=4) // 0.87209181108731892 (on depth=0)
     E_out: 0.8872206627768779
 
+    depth=0:
+    E_val:
+    E_in: 0.909368 // 0.909368
+    E_out: 0.8864839071529611
+
     depth=1:
     E_val:
-    E_in: 0.956762 // 0.903489
-    E_out: 0.8835439618156952
+    E_in: 0.956676 // 0.903537
+    E_out: 0.8851856544683128
 
     depth=2:
     E_val:
@@ -889,36 +894,33 @@ def lr_with_scale3():
     E_val:
     E_in: 0.879233
     E_out: 0.8770121701777971
+
+    Submission: lr_with_scale3_0712_01.csv
+    E_val:
+    E_in:
+    E_out:
     """
-    from sklearn.linear_model import LogisticRegressionCV, LogisticRegression
+    from sklearn.linear_model import LogisticRegression
     from sklearn.preprocessing import StandardScaler
+    from sklearn.cross_validation import cross_val_score
     from sklearn.pipeline import Pipeline
     import numpy as np
 
     X, y = dataset.load_train()
 
     raw_scaler = StandardScaler()
-    raw_scaler.fit(X)
-    X_scaled = raw_scaler.transform(X)
-
-    clf = LogisticRegressionCV(Cs=50, cv=5, scoring='roc_auc', n_jobs=-1,
-                               class_weight='auto', refit=False)
-    clf.fit(X_scaled, y)
-    logger.debug('Best C: %f', clf.C_[0])
-    logger.debug('Cs: %s', clf.Cs_)
-    logger.debug('Grid scores: %f', clf.scores_)
-
-    clf = LogisticRegression(C=clf.C_[0], class_weight='auto')
-
     raw_scaler.fit(np.r_[X, dataset.load_test()])
     X_scaled = raw_scaler.transform(X)
 
+    clf = LogisticRegression(C=0.03, class_weight='auto')
     clf.fit(X_scaled, y)
 
     logger.debug('E_in: %f', Util.auc_score(clf, X_scaled, y))
-
     IO.dump_submission(Pipeline([('scale_raw', raw_scaler),
-                                 ('lr', clf)]), 'lr_with_scale3_0707_04')
+                                 ('lr', clf)]), 'lr_with_scale3_0712_01')
+
+    scores = cross_val_score(clf, X_scaled, y, scoring='roc_auc', n_jobs=-1)
+    logger.debug('E_val: %f <- %s', np.average(scores), scores)
 
 
 if __name__ == '__main__':
