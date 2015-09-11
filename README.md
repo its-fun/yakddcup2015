@@ -3,6 +3,22 @@
 
 Based on [https://github.com/Divergent914/kddcup2015](https://github.com/Divergent914/kddcup2015)
 
+## Final result
+
+### Public board
+
+This leaderboard calculates scores by about 50% of the test data.
+
+AUC score: 0.8874428893001793
+
+Rank: #89
+
+### Private board
+
+AUC score: 0.8867360110438458
+
+Rank: #86
+
 
 ## TODO
 
